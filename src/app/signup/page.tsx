@@ -63,7 +63,7 @@ export default function SignUpPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-400"
-                placeholder="John Doe"
+                placeholder="สมพงษ์ แก่นแก้ว"
                 disabled={isLoading}
               />
             </div>
