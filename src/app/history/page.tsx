@@ -127,15 +127,9 @@ export default function TransactionHistoryPage() {
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Transaction History</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Transaction History 📃</h1>
               <p className="mt-1 text-gray-600">View all your stock transactions</p>
             </div>
-            <Link
-              href="/portfolio"
-              className="rounded-md bg-gray-600 px-4 py-2 font-medium text-white hover:bg-gray-700"
-            >
-              ← Back to Portfolio
-            </Link>
           </div>
 
           {/* Time Filter Buttons */}

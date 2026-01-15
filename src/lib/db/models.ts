@@ -86,6 +86,42 @@ const transactionSchema = new Schema(
 // Index for faster queries by user
 transactionSchema.index({ userId: 1, date: -1 });
 
+// Wishlist Schema
+const wishlistSchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    symbol: {
+      type: String,
+      required: true,
+      uppercase: true,
+      trim: true,
+    },
+    notes: {
+      type: String,
+      default: "",
+    },
+    targetPrice: {
+      type: Number,
+      min: 0,
+    },
+    addedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Compound index: userId + symbol must be unique
+wishlistSchema.index({ userId: 1, symbol: 1 }, { unique: true });
+
 // Get or create models
 const PortfolioStock: Model<Document> =
   mongoose.models.PortfolioStock ||
@@ -95,4 +131,8 @@ const Transaction: Model<Document> =
   mongoose.models.Transaction ||
   mongoose.model("Transaction", transactionSchema);
 
-export { PortfolioStock, Transaction };
+const Wishlist: Model<Document> =
+  mongoose.models.Wishlist ||
+  mongoose.model("Wishlist", wishlistSchema);
+
+export { PortfolioStock, Transaction, Wishlist };
