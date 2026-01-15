@@ -152,7 +152,7 @@ export default function EditStockPage() {
         <div className="mx-auto max-w-2xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Edit {stock.symbol}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Buy/Sell {stock.symbol}</h1>
             <p className="mt-2 text-gray-600">Buy more or sell this stock</p>
           </div>
 
@@ -160,7 +160,7 @@ export default function EditStockPage() {
             {/* Stock Details Card */}
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Current Position</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Current Data</h2>
                 <StockLogo symbol={stock.symbol} size="lg" />
               </div>
 

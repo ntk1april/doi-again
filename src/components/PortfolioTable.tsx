@@ -129,7 +129,7 @@ export default function PortfolioTable({ stocks }: Props) {
                     href={`/portfolio/edit/${stock.symbol}`}
                     className="inline-block rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700"
                   >
-                    Edit
+                    Buy/Sell
                   </Link>
                 </td>
               </tr>
