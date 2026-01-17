@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import StockLogo from "@/components/StockLogo";
 import { authFetch } from "@/lib/utils/auth-fetch";
+import Swal from "sweetalert2";
 
 interface WishlistItem {
   _id: string;
@@ -80,7 +81,7 @@ export default function WishlistPage() {
 
       const results = await Promise.all(pricePromises);
       const newPrices = new Map<string, StockPrice>();
-      
+
       results.forEach(result => {
         if (result) {
           newPrices.set(result.symbol, result.data);
@@ -100,9 +101,9 @@ export default function WishlistPage() {
       "after-hours": { text: "After Hours", color: "bg-purple-100 text-purple-700" },
       "closed": { text: "Market Closed", color: "bg-gray-100 text-gray-700" },
     };
-    
+
     const badge = badges[status as keyof typeof badges] || badges.closed;
-    
+
     return (
       <span className={`text-xs px-2 py-1 rounded-full font-medium ${badge.color}`}>
         {badge.text}
@@ -111,7 +112,16 @@ export default function WishlistPage() {
   };
 
   const handleRemove = async (symbol: string) => {
-    if (!confirm(`Remove ${symbol} from wishlist?`)) return;
+    const result = await Swal.fire({
+      title: `Remove ${symbol} from wishlist?`,
+      text: `Are you sure you want to remove ${symbol} from your wishlist?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "ลบแม่งเลย",
+      cancelButtonText: "เก็บไว้ก่อน ตัวนี้น่าสน",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const response = await authFetch(`/api/wishlist/${symbol}`, {
@@ -123,10 +133,18 @@ export default function WishlistPage() {
       if (data.success) {
         fetchWishlist();
       } else {
-        alert(data.error || "Failed to remove from wishlist");
+        Swal.fire({
+          title: "Failed to remove from wishlist",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       }
     } catch (err) {
-      alert("Failed to remove from wishlist");
+      Swal.fire({
+        title: "Failed to remove from wishlist",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -177,7 +195,7 @@ export default function WishlistPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {wishlist.map((item) => {
                 const priceData = prices.get(item.symbol);
-                
+
                 return (
                   <div
                     key={item._id}

@@ -8,12 +8,13 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { PortfolioStock, ApiResponse} from "@/types";
+import { PortfolioStock, ApiResponse } from "@/types";
 import { formatCurrency, formatNumber } from "@/lib/utils/calculations";
 import StockForm, { FormData } from "@/components/AddStockForm";
 import StockLogo from "@/components/StockLogo";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { authFetch } from "@/lib/utils/auth-fetch";
+import Swal from "sweetalert2";
 
 export default function EditStockPage() {
   const router = useRouter();
@@ -77,41 +78,52 @@ export default function EditStockPage() {
   };
 
   const handleSubmit = async (formData: FormData) => {
-    try {
-      setIsSubmitting(true);
-      setSuccessMessage("");
-      setError("");
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to ${action.toLowerCase()} ${formData.units} units of ${symbol} at ${formatCurrency(formData.price)} each!`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${action.toLowerCase()} it!`,
+      cancelButtonText: "Cancel",
+    });
 
-      const response = await authFetch(`/api/portfolio/stocks/${symbol}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          action,
-          units: formData.units,
-          price: formData.price,
-        }),
-      });
+    if (result.isConfirmed) {
+      try {
+        setIsSubmitting(true);
+        setSuccessMessage("");
+        setError("");
 
-      const data: ApiResponse = await response.json();
+        const response = await authFetch(`/api/portfolio/stocks/${symbol}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            action,
+            units: formData.units,
+            price: formData.price,
+          }),
+        });
 
-      if (!data.success) {
-        throw new Error(data.error || `Failed to ${action.toLowerCase()} stock`);
+        const data: ApiResponse = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || `Failed to ${action.toLowerCase()} stock`);
+        }
+
+        if (action === "SELL" && !stock?.units) {
+          setSuccessMessage("Stock completely sold and removed from portfolio!");
+        } else {
+          setSuccessMessage(`Successfully ${action.toLowerCase()}ed ${formData.units} units!`);
+        }
+
+        // Refresh and redirect after 2 seconds
+        setTimeout(() => {
+          router.push("/portfolio");
+        }, 2000);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+        throw err;
+      } finally {
+        setIsSubmitting(false);
       }
-
-      if (action === "SELL" && !stock?.units) {
-        setSuccessMessage("Stock completely sold and removed from portfolio!");
-      } else {
-        setSuccessMessage(`Successfully ${action.toLowerCase()}ed ${formData.units} units!`);
-      }
-
-      // Refresh and redirect after 2 seconds
-      setTimeout(() => {
-        router.push("/portfolio");
-      }, 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -202,9 +214,8 @@ export default function EditStockPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Realized P/L:</span>
                   <span
-                    className={`font-semibold ${
-                      stock.realizedPnl >= 0 ? "text-green-600" : "text-red-600"
-                    }`}
+                    className={`font-semibold ${stock.realizedPnl >= 0 ? "text-green-600" : "text-red-600"
+                      }`}
                   >
                     {formatCurrency(stock.realizedPnl)}
                   </span>

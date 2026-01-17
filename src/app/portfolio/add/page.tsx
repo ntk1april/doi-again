@@ -12,6 +12,8 @@ import AddStockForm, { FormData } from "@/components/AddStockForm";
 import { ApiResponse } from "@/types";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { authFetch } from "@/lib/utils/auth-fetch";
+import Swal from "sweetalert2";
+import { formatCurrency } from "@/lib/utils/calculations";
 
 function AddStockContent() {
   const router = useRouter();
@@ -22,37 +24,48 @@ function AddStockContent() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (formData: FormData) => {
-    try {
-      setIsLoading(true);
-      setSuccessMessage("");
-      setErrorMessage("");
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to add ${formData.units} units of ${formData.symbol} at ${formatCurrency(formData.price)} each!`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, add it!",
+      cancelButtonText: "Cancel",
+    });
 
-      const response = await authFetch("/api/portfolio/stocks", {
-        method: "POST",
-        body: JSON.stringify({
-          symbol: formData.symbol,
-          units: formData.units,
-          buyPrice: formData.price,
-        }),
-      });
+    if (result.isConfirmed) {
+      try {
+        setIsLoading(true);
+        setSuccessMessage("");
+        setErrorMessage("");
 
-      const data: ApiResponse = await response.json();
+        const response = await authFetch("/api/portfolio/stocks", {
+          method: "POST",
+          body: JSON.stringify({
+            symbol: formData.symbol,
+            units: formData.units,
+            buyPrice: formData.price,
+          }),
+        });
 
-      if (!data.success) {
-        throw new Error(data.error || "Failed to add stock");
+        const data: ApiResponse = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || "Failed to add stock");
+        }
+
+        setSuccessMessage(`Successfully added ${formData.units} units of ${formData.symbol}!`);
+
+        // Redirect to portfolio after 2 seconds
+        setTimeout(() => {
+          router.push("/portfolio");
+        }, 2000);
+      } catch (err) {
+        setErrorMessage(err instanceof Error ? err.message : "An error occurred");
+        throw err;
+      } finally {
+        setIsLoading(false);
       }
-
-      setSuccessMessage(`Successfully added ${formData.units} units of ${formData.symbol}!`);
-
-      // Redirect to portfolio after 2 seconds
-      setTimeout(() => {
-        router.push("/portfolio");
-      }, 2000);
-    } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -7,6 +7,7 @@ import StockLogo from "@/components/StockLogo";
 import AuthModal from "@/components/AuthModal";
 import { authFetch } from "@/lib/utils/auth-fetch";
 import { useAuth } from "@/contexts/AuthContext";
+import Swal from "sweetalert2";
 
 interface StockDetails {
   symbol: string;
@@ -60,23 +61,23 @@ export default function StockDetailPage() {
   const checkPortfolioAndWishlist = async () => {
     try {
       setCheckingStatus(true);
-      
+
       // Only check if user is authenticated
       if (!user) {
         setCheckingStatus(false);
         return;
       }
-      
+
       // Check portfolio
       const portfolioResponse = await authFetch("/api/portfolio/stocks");
       const portfolioData = await portfolioResponse.json();
       if (portfolioData.success && portfolioData.data) {
         // Portfolio API returns { success, data: { stocks: [...] } }
-        const stocks = Array.isArray(portfolioData.data) 
-          ? portfolioData.data 
+        const stocks = Array.isArray(portfolioData.data)
+          ? portfolioData.data
           : portfolioData.data.stocks || [];
-        
-        const inPortfolio = stocks.some((stock: any) => 
+
+        const inPortfolio = stocks.some((stock: any) =>
           stock.symbol.toUpperCase() === symbol.toUpperCase()
         );
         setIsInPortfolio(inPortfolio);
@@ -86,7 +87,7 @@ export default function StockDetailPage() {
       const wishlistResponse = await authFetch("/api/wishlist");
       const wishlistData = await wishlistResponse.json();
       if (wishlistData.success && wishlistData.data) {
-        const inWishlist = wishlistData.data.some((item: any) => 
+        const inWishlist = wishlistData.data.some((item: any) =>
           item.symbol.toUpperCase() === symbol.toUpperCase()
         );
         setIsInWishlist(inWishlist);
@@ -114,34 +115,73 @@ export default function StockDetailPage() {
       const data = await response.json();
 
       if (data.success) {
-        alert(`${symbol} added to wishlist!`);
+        Swal.fire({
+          icon: "success",
+          title: "Stock added to wishlist!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
         setIsInWishlist(true);
       } else {
-        alert(data.error || "Failed to add to wishlist");
+        Swal.fire({
+          icon: "error",
+          title: data.error || "Failed to add to wishlist",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }
     } catch (err) {
-      alert("Failed to add to wishlist");
+      Swal.fire({
+        icon: "error",
+        title: "Failed to add to wishlist",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     }
   };
 
   const handleRemoveFromWishlist = async () => {
-    if (!confirm(`Remove ${symbol} from wishlist?`)) return;
+    const result = await Swal.fire({
+      title: `Remove ${symbol} from wishlist?`,
+      text: `Are you sure you want to remove ${symbol} from your wishlist?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "ลบแม่งเลย",
+      cancelButtonText: "เก็บไว้ก่อน ตัวนี้น่าสน",
+    })
 
-    try {
-      const response = await authFetch(`/api/wishlist/${symbol}`, {
-        method: "DELETE",
-      });
+    if (result.isConfirmed) {
+      try {
+        const response = await authFetch(`/api/wishlist/${symbol}`, {
+          method: "DELETE",
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.success) {
-        alert(`${symbol} removed from wishlist`);
-        setIsInWishlist(false);
-      } else {
-        alert(data.error || "Failed to remove from wishlist");
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: `${symbol} removed from wishlist`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setIsInWishlist(false);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: data.error || "Failed to remove from wishlist",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to remove from wishlist",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }
-    } catch (err) {
-      alert("Failed to remove from wishlist");
     }
   };
 
@@ -412,11 +452,11 @@ export default function StockDetailPage() {
                       { label: "Sell", value: latestRecommendation.sell, color: "red-600" },
                       { label: "Strong Sell", value: latestRecommendation.strongSell, color: "red-700" },
                     ].map((item) => {
-                      const total = latestRecommendation.strongBuy + latestRecommendation.buy + 
-                                   latestRecommendation.hold + latestRecommendation.sell + 
-                                   latestRecommendation.strongSell;
+                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
+                        latestRecommendation.hold + latestRecommendation.sell +
+                        latestRecommendation.strongSell;
                       const percentage = (item.value / total) * 100;
-                      
+
                       return (
                         <div key={item.label} className="flex items-center gap-4">
                           <div className="flex-1">
@@ -489,8 +529,8 @@ export default function StockDetailPage() {
       </div>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
+      <AuthModal
+        isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode={authModalMode}
       />

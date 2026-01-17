@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import StockLogo from "./StockLogo";
 import AuthModal from "./AuthModal";
 import { authFetch } from "@/lib/utils/auth-fetch";
+import Swal from "sweetalert2";
 
 interface StockSuggestion {
   symbol: string;
@@ -99,7 +100,7 @@ export default function Navbar() {
       setShowAuthModal(true);
       return;
     }
-    
+
     try {
       const response = await authFetch("/api/wishlist", {
         method: "POST",
@@ -109,19 +110,36 @@ export default function Navbar() {
       const data = await response.json();
 
       if (data.success) {
-        alert(`${symbol} added to wishlist!`);
+        Swal.fire({
+          title: `${symbol} added to wishlist!`,
+          icon: "success",
+          draggable: true,
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          if (pathname === "/wishlist") {
+            window.location.reload();
+          }
+        });
         setShowActionMenu(null);
         setSearchQuery("");
         setSuggestions([]);
         setShowSuggestions(false);
-        if (pathname === "/wishlist") {
-          window.location.reload();
-        }
       } else {
-        alert(data.error || "Failed to add to wishlist");
+        Swal.fire({
+          title: "Failed to add to wishlist",
+          icon: "error",
+          draggable: true,
+          confirmButtonText: "OK",
+        });
       }
     } catch (err) {
-      alert("Failed to add to wishlist");
+      Swal.fire({
+        title: "Failed to add to wishlist",
+        icon: "error",
+        draggable: true,
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -162,41 +180,37 @@ export default function Navbar() {
               <div className="hidden md:flex items-center gap-4">
                 <Link
                   href="/portfolio"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === "/portfolio"
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/portfolio"
+                    ? "bg-white/20 text-white"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
                   Portfolio 💼
                 </Link>
                 <Link
                   href="/wishlist"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname?.startsWith("/wishlist")
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname?.startsWith("/wishlist")
+                    ? "bg-white/20 text-white"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
                   Wishlist 🔖
                 </Link>
                 <Link
                   href="/history"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === "/portfolio/history"
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/portfolio/history"
+                    ? "bg-white/20 text-white"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
                   History 📜
                 </Link>
                 <Link
                   href="/news"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === "/news"
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/news"
+                    ? "bg-white/20 text-white"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
                   News 📰
                 </Link>
@@ -306,8 +320,8 @@ export default function Navbar() {
       </div>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
+      <AuthModal
+        isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode={authModalMode}
       />
