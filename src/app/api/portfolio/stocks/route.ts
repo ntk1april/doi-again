@@ -14,7 +14,7 @@ import { getStockLogo } from "@/lib/utils/logos";
 import {
   PortfolioStock as PortfolioStockType,
   ApiResponse,
-  EnhancedStock,
+  PortfolioTableFiled,
   PortfolioSummary,
 } from "@/types";
 import { requireAuth } from "@/lib/auth/middleware";
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const stocks = (await PortfolioStock.find({ userId })) as any[];
 
     // Enrich stocks with current prices and calculated fields
-    const enhancedStocks: EnhancedStock[] = await Promise.all(
+    const portfolioTableFiled: PortfolioTableFiled[] = await Promise.all(
       stocks.map(async (stock) => {
         // Fetch real price, fallback to avgPrice if API unavailable
         let currentPrice: number;
@@ -79,23 +79,23 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Calculate portfolio summary
     const summary: PortfolioSummary = {
-      totalInvested: enhancedStocks.reduce(
+      totalInvested: portfolioTableFiled.reduce(
         (sum, stock) => sum + stock.totalCost,
         0
       ),
-      currentValue: enhancedStocks.reduce(
+      currentValue: portfolioTableFiled.reduce(
         (sum, stock) => sum + stock.currentValue,
         0
       ),
-      unrealizedPnl: enhancedStocks.reduce(
+      unrealizedPnl: portfolioTableFiled.reduce(
         (sum, stock) => sum + stock.unrealizedPnl,
         0
       ),
-      realizedPnl: enhancedStocks.reduce(
+      realizedPnl: portfolioTableFiled.reduce(
         (sum, stock) => sum + stock.realizedPnl,
         0
       ),
-      netPnl: enhancedStocks.reduce((sum, stock) => sum + stock.netPnl, 0),
+      netPnl: portfolioTableFiled.reduce((sum, stock) => sum + stock.netPnl, 0),
       netPnlPercent: 0,
     };
 
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         success: true,
-        data: { stocks: enhancedStocks, summary },
+        data: { stocks: portfolioTableFiled, summary },
       } as ApiResponse,
       { status: 200 }
     );

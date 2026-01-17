@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { PortfolioStock, ApiResponse, EnhancedStock } from "@/types";
+import { PortfolioStock, ApiResponse} from "@/types";
 import { formatCurrency, formatNumber } from "@/lib/utils/calculations";
 import StockForm, { FormData } from "@/components/AddStockForm";
 import StockLogo from "@/components/StockLogo";

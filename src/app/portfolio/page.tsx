@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PortfolioSummary from "@/components/PortfolioSummary";
 import PortfolioTable from "@/components/PortfolioTable";
-import { EnhancedStock, PortfolioSummary as PortfolioSummaryType, ApiResponse } from "@/types";
+import { PortfolioTableFiled, PortfolioSummary as PortfolioSummaryType, ApiResponse } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/utils/auth-fetch";
 
@@ -35,7 +35,7 @@ const investorQuotes: Quote[] = [
 ];
 
 export default function PortfolioDashboard() {
-  const [stocks, setStocks] = useState<EnhancedStock[]>([]);
+  const [stocks, setStocks] = useState<PortfolioTableFiled[]>([]);
   const [summary, setSummary] = useState<PortfolioSummaryType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -78,7 +78,7 @@ export default function PortfolioDashboard() {
       }
 
       const { stocks: fetchedStocks, summary: fetchedSummary } = data.data as {
-        stocks: EnhancedStock[];
+        stocks: PortfolioTableFiled[];
         summary: PortfolioSummaryType;
       };
 
