@@ -6,7 +6,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import StockForm, { FormData } from "@/components/StockForm";
 import { ApiResponse } from "@/types";
@@ -15,6 +15,8 @@ import { authFetch } from "@/lib/utils/auth-fetch";
 
 export default function AddStockPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const symbolFromUrl = searchParams.get("symbol") || "";
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -86,6 +88,7 @@ export default function AddStockPage() {
               onSubmit={handleSubmit}
               isLoading={isLoading}
               submitLabel="Add Stock"
+              initialSymbol={symbolFromUrl}
             />
 
             {/* Back Link */}

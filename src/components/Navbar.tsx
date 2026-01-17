@@ -133,6 +133,18 @@ export default function Navbar() {
     router.push(`/stocks/${symbol}`);
   };
 
+  const handleRowClick = (symbol: string, e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("a")) {
+      return;
+    }
+    setShowActionMenu(null);
+    setSearchQuery("");
+    setSuggestions([]);
+    setShowSuggestions(false);
+    router.push(`/stocks/${symbol}`);
+  };
+
   // Show navbar on all pages now (no signin/signup pages to hide it on)
   return (
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
@@ -219,7 +231,10 @@ export default function Navbar() {
                     >
                       <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
                         <StockLogo symbol={suggestion.symbol} size="md" />
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0"
+                          onClick={(e) => handleRowClick(suggestion.symbol, e)}
+                          title={suggestion.name}
+                        >
                           <div className="font-semibold text-gray-900">{suggestion.symbol}</div>
                           <div className="text-sm text-gray-600 truncate">{suggestion.name}</div>
                         </div>

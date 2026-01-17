@@ -12,16 +12,18 @@ interface Quote {
 }
 
 const investorQuotes: Quote[] = [
-  { text: "The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "Philip Fisher" },
-  { text: "In investing, what is comfortable is rarely profitable.", author: "Robert Arnott" },
-  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
-  { text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
-  { text: "The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham" },
-  { text: "It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong.", author: "George Soros" },
-  { text: "The four most dangerous words in investing are: 'this time it's different.'", author: "Sir John Templeton" },
-  { text: "Know what you own, and know why you own it.", author: "Peter Lynch" },
-  { text: "The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
-  { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+  { text: "ตลาดหุ้นเต็มไปด้วยผู้คนที่รู้ราคาของทุกสิ่ง แต่ไม่รู้คุณค่าของสิ่งใดเลย - The stock market is filled with individuals who know the price of everything, but the value of nothing.", author: "Philip Fisher" },
+  { text: "ในการลงทุน สิ่งที่ทำให้รู้สึกสบายใจมักจะไม่สร้างผลกำไร - In investing, what is comfortable is rarely profitable.", author: "Robert Arnott" },
+  { text: "เวลาที่ดีที่สุดในการปลูกต้นไม้คือเมื่อ 20 ปีที่แล้ว เวลาที่ดีรองลงมาคือตอนนี้ - The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+  { text: "ความเสี่ยงเกิดจากการไม่รู้ว่าตัวเองกำลังทำอะไรอยู่ - Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
+  { text: "นักลงทุนรายบุคคลควรประพฤติตนอย่างสม่ำเสมอในฐานะนักลงทุน ไม่ใช่ในฐานะนักเก็งกำไร - The individual investor should act consistently as an investor and not as a speculator.", author: "Ben Graham" },
+  { text: "สิ่งสำคัญไม่ได้อยู่ที่ว่าคุณถูกหรือผิด แต่อยู่ที่ว่าคุณได้เงินเท่าไหร่เมื่อคุณถูก และคุณจะเสียเงินเท่าไหร่เมื่อคุณผิด - It's not whether you're right or wrong that's important, but how much money you make when you're right and how much you lose when you're wrong.", author: "George Soros" },
+  { text: "คำที่อันตรายที่สุดในการลงทุนคือ: 'ครั้งนี้มันต่างออกไป' - The most dangerous words in investing are: 'this time it's different.'", author: "Sir John Templeton" },
+  { text: "จงรู้ว่าคุณเป็นเจ้าของอะไร และจงรู้ว่าทำไมคุณถึงเป็นเจ้าของสิ่งนั้น - Know what you own, and know why you own it.", author: "Peter Lynch" },
+  { text: "ตลาดหุ้นเป็นกลไกในการโอนเงินจากคนที่ใจร้อนไปยังคนที่ใจเย็นกว่า - The stock market is a device for transferring money from the impatient to the patient.", author: "Warren Buffett" },
+  { text: "การลงทุนในความรู้ให้ผลตอบแทนที่ดีที่สุด - An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+  { text: "ไม่ขาย = ไม่ขาดทุน - Not selling means not losing money.", author: "Nanthakorn K." },
+  { text: "ความเสี่ยงสูง = ผลตอบแทนสูง - High risk, high return", author: "CK Cheong" },
 ];
 
 export default function HomePage() {
@@ -40,12 +42,12 @@ export default function HomePage() {
     }
   }, [user, router]);
 
-  // Rotate quotes every 10 seconds
+  // Rotate quotes every 15 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * investorQuotes.length);
       setCurrentQuote(investorQuotes[randomIndex]);
-    }, 10000);
+    }, 15000);
 
     return () => clearInterval(interval);
   }, []);
@@ -85,7 +87,7 @@ export default function HomePage() {
               📉 Doy Again
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto">
-              Track your investments, analyze trends, and grow your wealth with confidence
+              Track your investments, analyze trends, and lost your money with confidence
             </p>
             
             {/* CTA Buttons */}

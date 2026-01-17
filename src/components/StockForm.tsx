@@ -42,6 +42,13 @@ export default function StockForm({
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Update symbol when initialSymbol prop changes
+  useEffect(() => {
+    if (initialSymbol) {
+      setSymbol(initialSymbol.toUpperCase());
+    }
+  }, [initialSymbol]);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
@@ -88,6 +95,14 @@ export default function StockForm({
       setSuggestions([]);
       setShowSuggestions(false);
     }
+  };
+
+  const handleRowClick = (symbol: string, e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest("a")) {
+      return;
+    }
+    window.location.href = `/stocks/${symbol}`;
   };
 
   const selectSuggestion = (sym: string) => {
@@ -163,10 +178,18 @@ export default function StockForm({
                   className="w-full text-left px-3 py-3 hover:bg-blue-50 border-b border-gray-200 last:border-b-0 flex items-center gap-3"
                 >
                   <StockLogo symbol={item.symbol} size="md" />
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0"
+                    title={item.name}
+                  >
                     <div className="font-medium text-black">{item.symbol}</div>
                     <div className="text-sm text-gray-500 truncate">{item.name}</div>
                   </div>
+                  <button
+                    onClick={(e) => handleRowClick(item.symbol, e)}
+                    className="rounded-md bg-blue-600 px-1 py-1 text-sm font-medium text-white hover:bg-blue-700"
+                  >
+                    Details
+                  </button>
                 </button>
               ))}
             </div>
