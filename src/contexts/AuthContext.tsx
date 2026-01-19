@@ -90,20 +90,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     const result = await Swal.fire({
       title: "Are you sure you want to sign out?",
-      icon: "warning",
+      icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Yes, sign out!",
-      cancelButtonText: "No, cancel!",
+      confirmButtonText: "Yes, i can't be here anymore!",
+      cancelButtonText: "No, i love red color!",
       confirmButtonColor: "#F93827",
       cancelButtonColor: "#16C47F",
     });
 
     if (result.isConfirmed) {
+      Swal.fire({
+        title: "Signed out successfully!",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setToken(null);
       setUser(null);
       router.push("/");
+    } else {
+      Swal.fire({
+        title: "You really love red color!",
+        imageUrl: "https://www.entrepreneur.com/wp-content/uploads/sites/2/2018/07/20180703190744-rollsafe-meme.jpeg?resize=800,450",
+        imageWidth: 400,
+        imageHeight: 225,
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   };
 

@@ -34,6 +34,7 @@ export default function HomePage() {
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // Redirect if already signed in
   useEffect(() => {
@@ -42,15 +43,22 @@ export default function HomePage() {
     }
   }, [user, router]);
 
-  // Rotate quotes every 15 seconds
+  // Rotate quotes every 10 seconds
   useEffect(() => {
+    if (!investorQuotes.length) return;
+
     const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * investorQuotes.length);
-      setCurrentQuote(investorQuotes[randomIndex]);
-    }, 15000);
+      setCurrentIndex((prev) =>
+        prev === investorQuotes.length - 1 ? 0 : prev + 1
+      );
+    }, 10000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [investorQuotes]);
+
+  useEffect(() => {
+    setCurrentQuote(investorQuotes[currentIndex]);
+  }, [currentIndex, investorQuotes]);
 
   // Fetch market news
   useEffect(() => {
@@ -87,7 +95,7 @@ export default function HomePage() {
               📉 Doy Again
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto">
-              Track your investments, analyze trends, and lost your money with confidence
+              If you happy in your whole day and you want to see something like red color to make you down, you can use this app
             </p>
 
             {/* CTA Buttons */}
@@ -120,7 +128,7 @@ export default function HomePage() {
       <div className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Everything You Need to Manage Your Portfolio
+            Features that help you manage your portfolio
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -128,7 +136,7 @@ export default function HomePage() {
               <div className="text-5xl mb-4">📊</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Portfolio Tracking</h3>
               <p className="text-gray-700">
-                Monitor your investments in real-time with detailed profit/loss calculations
+                Monitor your investments with detailed profit/loss calculations
               </p>
             </div>
 
@@ -136,7 +144,7 @@ export default function HomePage() {
               <div className="text-5xl mb-4">⭐</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Wishlist</h3>
               <p className="text-gray-700">
-                Track stocks you're interested in with notes and target prices
+                Track stocks you're interested for add to portfolio or just keep an eye on them
               </p>
             </div>
 
@@ -144,7 +152,7 @@ export default function HomePage() {
               <div className="text-5xl mb-4">📈</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Market Analysis</h3>
               <p className="text-gray-700">
-                Get comprehensive stock details, analyst recommendations, and sentiment data
+                Get stock details, analyst recommendations, and news about the stock
               </p>
             </div>
           </div>
@@ -201,23 +209,24 @@ export default function HomePage() {
             </div>
           )}
         </div>
+        <p className="py-6 text-blue-500 text-center cursor-pointer hover:text-blue-700" onClick={() => setShowAuthModal(true)}>Sign in to see more news</p>
       </div>
 
       {/* Footer CTA */}
       <div className="bg-gradient-to-r from-red-500 to-green-500 py-16">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Start Your Investment Journey?
+            📉 Are you ready to see red color?
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Join thousands of investors tracking their portfolios with Doy Again
+            Join with one of all investors who never see green color in his life like me, with Doy Again
           </p>
           <button
             onClick={() => {
               setAuthModalMode("signup");
               setShowAuthModal(true);
             }}
-            className="inline-block rounded-lg bg-white px-8 py-4 text-lg font-semibold text-green-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+            className="inline-block rounded-lg bg-white px-8 py-4 text-lg font-semibold text-blue-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
           >
             Create Free Account
           </button>

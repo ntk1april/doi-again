@@ -44,6 +44,7 @@ export default function PortfolioDashboard() {
   const [exchangeRate, setExchangeRate] = useState(31.45); // Default fallback
   const { user, signOut, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     // Redirect to home if not authenticated
@@ -60,13 +61,20 @@ export default function PortfolioDashboard() {
 
   // Rotate quotes every 10 seconds
   useEffect(() => {
+    if (!investorQuotes.length) return;
+
     const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * investorQuotes.length);
-      setCurrentQuote(investorQuotes[randomIndex]);
+      setCurrentIndex((prev) =>
+        prev === investorQuotes.length - 1 ? 0 : prev + 1
+      );
     }, 10000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [investorQuotes]);
+
+  useEffect(() => {
+    setCurrentQuote(investorQuotes[currentIndex]);
+  }, [currentIndex, investorQuotes]);
 
   const fetchExchangeRate = async () => {
     try {

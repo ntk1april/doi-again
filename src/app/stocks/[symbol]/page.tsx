@@ -246,7 +246,7 @@ export default function StockDetailPage() {
     );
   }
 
-  const { profile, quote, metrics, recommendations, sentiment } = stockDetails;
+  const { profile, quote, metrics, recommendations } = stockDetails;
   const latestRecommendation = recommendations?.[0];
 
   return (
@@ -477,85 +477,168 @@ export default function StockDetailPage() {
               {/* Analyst Recommendations */}
               {latestRecommendation && (
                 <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    Analyst Recommendations
-                  </h2>
-                  <div className="space-y-3">
-                    {[
-                      { label: "Strong Buy", value: latestRecommendation.strongBuy, color: "green-700" },
-                      { label: "Buy", value: latestRecommendation.buy, color: "green-600" },
-                      { label: "Hold", value: latestRecommendation.hold, color: "gray-600" },
-                      { label: "Sell", value: latestRecommendation.sell, color: "red-600" },
-                      { label: "Strong Sell", value: latestRecommendation.strongSell, color: "red-700" },
-                    ].map((item) => {
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Analyst Recommendations
+                    </h2>
+                    {/* Overall Recommendation Summary */}
+                    {(() => {
                       const total = latestRecommendation.strongBuy + latestRecommendation.buy +
                         latestRecommendation.hold + latestRecommendation.sell +
                         latestRecommendation.strongSell;
-                      const percentage = (item.value / total) * 100;
+
+                      // Calculate which recommendation has the most votes
+                      const recommendations = [
+                        { label: "Strong Buy", value: latestRecommendation.strongBuy, color: "bg-green-700 text-white" },
+                        { label: "Buy", value: latestRecommendation.buy, color: "bg-green-600 text-white" },
+                        { label: "Hold", value: latestRecommendation.hold, color: "bg-gray-600 text-white" },
+                        { label: "Sell", value: latestRecommendation.sell, color: "bg-red-600 text-white" },
+                        { label: "Strong Sell", value: latestRecommendation.strongSell, color: "bg-red-700 text-white" },
+                      ];
+
+                      const topRecommendation = recommendations.reduce((prev, current) =>
+                        (current.value > prev.value) ? current : prev
+                      );
 
                       return (
-                        <div key={item.label} className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">Consensus:</span>
+                          <span className={`px-4 py-2 rounded-lg font-semibold text-sm ${topRecommendation.color}`}>
+                            {topRecommendation.label}
+                          </span>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  <div className="space-y-3">
+                    {/* Strong Buy */}
+                    {(() => {
+                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
+                        latestRecommendation.hold + latestRecommendation.sell +
+                        latestRecommendation.strongSell;
+                      const percentage = (latestRecommendation.strongBuy / total) * 100;
+
+                      return (
+                        <div className="flex items-center gap-4">
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <span className={`text-sm font-medium text-${item.color}`}>{item.label}</span>
-                              <span className="text-sm font-semibold text-gray-900">{item.value}</span>
+                              <span className="text-sm font-medium text-green-700">Strong Buy</span>
+                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.strongBuy}</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
-                                className={`h-full bg-${item.color}`}
+                                className="h-full bg-green-700"
                                 style={{ width: `${percentage}%` }}
                               />
                             </div>
                           </div>
                         </div>
                       );
-                    })}
+                    })()}
+
+                    {/* Buy */}
+                    {(() => {
+                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
+                        latestRecommendation.hold + latestRecommendation.sell +
+                        latestRecommendation.strongSell;
+                      const percentage = (latestRecommendation.buy / total) * 100;
+
+                      return (
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm font-medium text-green-600">Buy</span>
+                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.buy}</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-green-600"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Hold */}
+                    {(() => {
+                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
+                        latestRecommendation.hold + latestRecommendation.sell +
+                        latestRecommendation.strongSell;
+                      const percentage = (latestRecommendation.hold / total) * 100;
+
+                      return (
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm font-medium text-gray-600">Hold</span>
+                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.hold}</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gray-600"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Sell */}
+                    {(() => {
+                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
+                        latestRecommendation.hold + latestRecommendation.sell +
+                        latestRecommendation.strongSell;
+                      const percentage = (latestRecommendation.sell / total) * 100;
+
+                      return (
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm font-medium text-red-600">Sell</span>
+                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.sell}</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-red-600"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Strong Sell */}
+                    {(() => {
+                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
+                        latestRecommendation.hold + latestRecommendation.sell +
+                        latestRecommendation.strongSell;
+                      const percentage = (latestRecommendation.strongSell / total) * 100;
+
+                      return (
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm font-medium text-red-700">Strong Sell</span>
+                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.strongSell}</span>
+                            </div>
+                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-red-700"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     <p className="text-xs text-gray-500 mt-2">
                       Period: {latestRecommendation.period}
                     </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Sentiment Analysis */}
-              {sentiment && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    News Sentiment
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    {sentiment.sentiment && (
-                      <>
-                        <div>
-                          <p className="text-sm text-gray-600">Bullish Sentiment</p>
-                          <p className="text-2xl font-semibold text-green-600">
-                            {(sentiment.sentiment.bullishPercent * 100).toFixed(1)}%
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">Bearish Sentiment</p>
-                          <p className="text-2xl font-semibold text-red-600">
-                            {(sentiment.sentiment.bearishPercent * 100).toFixed(1)}%
-                          </p>
-                        </div>
-                      </>
-                    )}
-                    {sentiment.buzz && (
-                      <>
-                        <div>
-                          <p className="text-sm text-gray-600">Articles This Week</p>
-                          <p className="text-2xl font-semibold text-gray-900">
-                            {sentiment.buzz.articlesInLastWeek}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">Buzz Score</p>
-                          <p className="text-2xl font-semibold text-gray-900">
-                            {sentiment.buzz.buzz?.toFixed(2)}
-                          </p>
-                        </div>
-                      </>
-                    )}
                   </div>
                 </div>
               )}
