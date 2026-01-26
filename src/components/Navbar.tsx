@@ -8,6 +8,7 @@ import StockLogo from "./StockLogo";
 import AuthModal from "./AuthModal";
 import { authFetch } from "@/lib/utils/auth-fetch";
 import Swal from "sweetalert2";
+import { Menu, X } from "lucide-react";
 
 interface StockSuggestion {
   symbol: string;
@@ -27,6 +28,7 @@ export default function Navbar() {
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
   const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const searchRef = useRef<HTMLDivElement>(null);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -316,6 +318,66 @@ export default function Navbar() {
               </button>
             </div>
           )}
+
+          {/*Mobile menu*/}
+          <div className="md:hidden">
+            {user && (
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="rounded-md p-2 text-white hover:bg-white/20 transition-colors"
+              >
+                {showMobileMenu ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
+            )}
+            {/* Mobile menu */}
+            {user && showMobileMenu && (
+              <div className="absolute top-full left-0 right-0 mt-2 rounded-lg border border-gray-200 bg-white shadow-xl max-h-96 overflow-y-auto">
+                {/* Mobile menu links */}
+                <div className="flex flex-col gap-2 p-4">
+                  <Link
+                    href="/portfolio"
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/portfolio"
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                  >
+                    Portfolio
+                  </Link>
+                  <Link
+                    href="/wishlist"
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/wishlist"
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                  >
+                    Wishlist
+                  </Link>
+                  <Link
+                    href="/history"
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/history"
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                  >
+                    History
+                  </Link>
+                  <Link
+                    href="/news"
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/news"
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                  >
+                    News
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

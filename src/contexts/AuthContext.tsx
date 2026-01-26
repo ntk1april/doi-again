@@ -46,6 +46,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password }),
     });
 
+    if (response.ok) {
+      Swal.fire({
+        title: "Are you ready to see your portfolio?",
+        imageUrl: "https://lede-admin.dailydot.com/wp-content/uploads/sites/69/2025/01/dog-closing-eyes-meme-1.png?w=1170&quality=75",
+        imageWidth: 391,
+        imageHeight: 277,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    }
+
     const data = await response.json();
 
     if (!data.success) {

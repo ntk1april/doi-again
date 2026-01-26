@@ -33,7 +33,7 @@ export default function HomePage() {
   const [marketNews, setMarketNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
+  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signup");
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Redirect if already signed in
@@ -209,7 +209,10 @@ export default function HomePage() {
             </div>
           )}
         </div>
-        <p className="py-6 text-blue-500 text-center cursor-pointer hover:text-blue-700" onClick={() => setShowAuthModal(true)}>Sign in to see more news</p>
+        <p className="mt-8 text-blue-500 text-center cursor-pointer hover:text-blue-700 text-lg font-semibold animate-bounce"
+          onClick={() => setShowAuthModal(true)}>
+          Join with us to see more news
+        </p>
       </div>
 
       {/* Footer CTA */}
