@@ -189,7 +189,7 @@ export default function PortfolioTable({ stocks, currency, exchangeRate }: Props
                 <SortIcon field="netPnl" />
               </div>
             </th>
-            <th className="px-4 py-3 text-center font-semibold text-gray-900">Actions</th>
+            <th className="px-4 py-3 text-center font-semibold text-gray-900"></th>
           </tr>
         </thead>
         <tbody>

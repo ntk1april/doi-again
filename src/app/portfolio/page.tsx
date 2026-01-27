@@ -140,7 +140,7 @@ export default function PortfolioDashboard() {
           </div>
           <div className="flex items-center gap-3">
             {/* Currency Toggle */}
-            <label className="text-sm font-semibold text-gray-700">Select currency:</label>
+            <label className="text-sm font-semibold text-gray-700">💱 Select currency:</label>
             <div className="flex items-center bg-white rounded-lg border border-gray-300 p-1">
               <button
                 onClick={() => setCurrency("USD")}
@@ -197,7 +197,7 @@ export default function PortfolioDashboard() {
         {/* Portfolio Summary */}
         {!isLoading && summary && (
           <>
-            <PortfolioSummary summary={summary} currency={currency} exchangeRate={exchangeRate} />
+            <PortfolioSummary summary={summary} currency={currency} exchangeRate={exchangeRate} stocks={stocks} />
 
             {/* Portfolio Table */}
             <div className="mt-8">
