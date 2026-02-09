@@ -220,7 +220,7 @@ export default function PortfolioTable({ stocks, currency, exchangeRate }: Props
 
                 {/* Avg Price */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {formatNumber(stock.avgPrice, 4)}
+                  {formatCurrency(convertValue(stock.avgPrice), currency)}
                 </td>
 
                 {/* Current Price */}
