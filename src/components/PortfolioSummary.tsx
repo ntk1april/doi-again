@@ -6,6 +6,8 @@
 import { PortfolioSummary as PortfolioSummaryType } from "@/types";
 import { formatCurrency, formatPercent } from "@/lib/utils/calculations";
 
+const HIDDEN = "••••••";
+
 interface Stock {
   symbol: string;
   netPnl: number;
@@ -16,15 +18,18 @@ interface Props {
   summary: PortfolioSummaryType;
   currency: "USD" | "THB";
   exchangeRate: number;
-  stocks?: Stock[]; // Optional stocks array to find top gainer/loser
+  stocks?: Stock[];
+  hideNumbers?: boolean;
 }
 
-export default function PortfolioSummary({ summary, currency, exchangeRate, stocks = [] }: Props) {
+export default function PortfolioSummary({ summary, currency, exchangeRate, stocks = [], hideNumbers = false }: Props) {
   const isProfit = summary.netPnl >= 0;
 
   const convertValue = (value: number) => {
     return currency === "THB" ? value * exchangeRate : value;
   };
+
+  const mask = (formatted: string) => (hideNumbers ? HIDDEN : formatted);
 
   // Find top gainer and top loser
   const topGainer = stocks.length > 0
@@ -41,7 +46,7 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
       <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
         <p className="text-sm font-medium text-gray-600">Total Invested 💵</p>
         <p className="mt-2 text-2xl font-bold text-gray-900">
-          {formatCurrency(convertValue(summary.totalInvested), currency)}
+          {mask(formatCurrency(convertValue(summary.totalInvested), currency))}
         </p>
       </div>
 
@@ -49,7 +54,7 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
       <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
         <p className="text-sm font-medium text-gray-600">Current Value 💸</p>
         <p className="mt-2 text-2xl font-bold text-gray-900">
-          {formatCurrency(convertValue(summary.currentValue), currency)}
+          {mask(formatCurrency(convertValue(summary.currentValue), currency))}
         </p>
       </div>
 
@@ -60,7 +65,7 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
           className={`mt-2 text-2xl font-bold ${isProfit ? "text-green-600" : "text-red-600"
             }`}
         >
-          {formatCurrency(convertValue(summary.netPnl), currency)}
+          {mask(formatCurrency(convertValue(summary.netPnl), currency))}
         </p>
         <p
           className={`mt-1 text-sm font-medium ${isProfit ? "text-green-600" : "text-red-600"
@@ -83,7 +88,7 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
                 {formatPercent(topGainer.netPnlPercent)}
               </p>
               <p className="mt-1 text-sm font-medium text-green-600">
-                ({formatCurrency(convertValue(topGainer.netPnl), currency)})
+                ({mask(formatCurrency(convertValue(topGainer.netPnl), currency))})
               </p>
             </div>
           </>
@@ -105,7 +110,7 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
                 {formatPercent(topLoser.netPnlPercent)}
               </p>
               <p className="mt-1 text-sm font-medium text-red-600">
-                ({formatCurrency(convertValue(topLoser.netPnl), currency)})
+                ({mask(formatCurrency(convertValue(topLoser.netPnl), currency))})
               </p>
             </div>
           </>

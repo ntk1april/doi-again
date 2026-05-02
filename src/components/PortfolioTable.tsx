@@ -17,12 +17,15 @@ interface Props {
   stocks: PortfolioTableFiled[];
   currency: "USD" | "THB";
   exchangeRate: number;
+  hideNumbers?: boolean;
 }
 
 type SortField = "symbol" | "units" | "avgPrice" | "currentPrice" | "totalCost" | "currentValue" | "unrealizedPnl" | "realizedPnl" | "netPnl";
 type SortDirection = "asc" | "desc";
 
-export default function PortfolioTable({ stocks, currency, exchangeRate }: Props) {
+const HIDDEN = "••••••";
+
+export default function PortfolioTable({ stocks, currency, exchangeRate, hideNumbers = false }: Props) {
   const router = useRouter();
   const [sortField, setSortField] = useState<SortField>("symbol");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -30,6 +33,8 @@ export default function PortfolioTable({ stocks, currency, exchangeRate }: Props
   const convertValue = (value: number) => {
     return currency === "THB" ? value * exchangeRate : value;
   };
+
+  const mask = (formatted: string) => (hideNumbers ? HIDDEN : formatted);
 
   if (stocks.length === 0) {
     return (
@@ -215,56 +220,53 @@ export default function PortfolioTable({ stocks, currency, exchangeRate }: Props
 
                 {/* Units */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {formatNumber(stock.units, 7)}
+                  {mask(formatNumber(stock.units, 7))}
                 </td>
 
                 {/* Avg Price */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {formatCurrency(convertValue(stock.avgPrice), currency)}
+                  {mask(formatCurrency(convertValue(stock.avgPrice), currency))}
                 </td>
 
                 {/* Current Price */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {formatCurrency(convertValue(stock.currentPrice), currency)}
+                  {mask(formatCurrency(convertValue(stock.currentPrice), currency))}
                 </td>
 
                 {/* Total Cost */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {formatCurrency(convertValue(stock.totalCost), currency)}
+                  {mask(formatCurrency(convertValue(stock.totalCost), currency))}
                 </td>
 
                 {/* Current Value */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {formatCurrency(convertValue(stock.currentValue), currency)}
+                  {mask(formatCurrency(convertValue(stock.currentValue), currency))}
                 </td>
 
                 {/* Unrealized P/L */}
                 <td
-                  className={`px-4 py-3 text-right font-medium ${isUnrealizedProfit ? "text-green-600" : "text-red-600"
-                    }`}
+                  className={`px-4 py-3 text-right font-medium ${isUnrealizedProfit ? "text-green-600" : "text-red-600"}`}
                 >
-                  {formatCurrency(convertValue(stock.unrealizedPnl), currency)}
+                  {formatPercent(stock.unrealizedPnlPercent)}
                   <div className="text-xs text-gray-500 font-normal">
-                    {formatPercent(stock.unrealizedPnlPercent)}
+                    {mask(formatCurrency(convertValue(stock.unrealizedPnl), currency))}
                   </div>
                 </td>
 
                 {/* Realized P/L */}
                 <td
-                  className={`px-4 py-3 text-right font-medium ${isRealizedProfit ? "text-green-600" : "text-red-600"
-                    }`}
+                  className={`px-4 py-3 text-right font-medium ${isRealizedProfit ? "text-green-600" : "text-red-600"}`}
                 >
-                  {formatCurrency(convertValue(stock.realizedPnl), currency)}
+                  {(formatCurrency(convertValue(stock.realizedPnl), currency))}
                 </td>
 
                 {/* Net P/L */}
                 <td
-                  className={`px-4 py-3 text-right font-bold ${isNetProfit ? "text-green-600" : "text-red-600"
-                    }`}
+                  className={`px-4 py-3 text-right font-bold ${isNetProfit ? "text-green-600" : "text-red-600"}`}
                 >
-                  {formatCurrency(convertValue(stock.netPnl), currency)}
+                  {formatPercent(stock.netPnlPercent)}
                   <div className="text-xs text-gray-500 font-normal">
-                    {formatPercent(stock.netPnlPercent)}
+                    {mask(formatCurrency(convertValue(stock.netPnl), currency))}
                   </div>
                 </td>
 
