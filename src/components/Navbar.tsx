@@ -23,7 +23,6 @@ export default function Navbar() {
   const [suggestions, setSuggestions] = useState<StockSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [showActionMenu, setShowActionMenu] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
   const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -35,7 +34,6 @@ export default function Navbar() {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setShowSuggestions(false);
-        setShowActionMenu(null);
       }
     };
 
@@ -89,7 +87,6 @@ export default function Navbar() {
       setShowAuthModal(true);
       return;
     }
-    setShowActionMenu(null);
     setSearchQuery("");
     setSuggestions([]);
     setShowSuggestions(false);
@@ -123,7 +120,6 @@ export default function Navbar() {
             window.location.reload();
           }
         });
-        setShowActionMenu(null);
         setSearchQuery("");
         setSuggestions([]);
         setShowSuggestions(false);
@@ -146,7 +142,6 @@ export default function Navbar() {
   };
 
   const handleViewDetails = (symbol: string) => {
-    setShowActionMenu(null);
     setSearchQuery("");
     setSuggestions([]);
     setShowSuggestions(false);
@@ -158,7 +153,6 @@ export default function Navbar() {
     if (target.closest("a")) {
       return;
     }
-    setShowActionMenu(null);
     setSearchQuery("");
     setSuggestions([]);
     setShowSuggestions(false);
@@ -254,37 +248,7 @@ export default function Navbar() {
                           <div className="font-semibold text-gray-900">{suggestion.symbol}</div>
                           <div className="text-sm text-gray-600 truncate">{suggestion.name}</div>
                         </div>
-                        <button
-                          onClick={() => setShowActionMenu(showActionMenu === suggestion.symbol ? null : suggestion.symbol)}
-                          className="rounded-md bg-blue-500 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700"
-                        >
-                          Actions ▼
-                        </button>
                       </div>
-
-                      {/* Action Menu */}
-                      {showActionMenu === suggestion.symbol && (
-                        <div className="absolute right-4 top-full mt-1 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-10">
-                          <button
-                            onClick={() => handleAddToPortfolio(suggestion.symbol)}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 border-b border-gray-100"
-                          >
-                            📊 Add to Portfolio
-                          </button>
-                          <button
-                            onClick={() => handleAddToWishlist(suggestion.symbol)}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 border-b border-gray-100"
-                          >
-                            ⭐ Add to Wishlist
-                          </button>
-                          <button
-                            onClick={() => handleViewDetails(suggestion.symbol)}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                          >
-                            🔍 View Details
-                          </button>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>

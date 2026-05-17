@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PortfolioSummary from "@/components/PortfolioSummary";
 import PortfolioTable from "@/components/PortfolioTable";
+import PortfolioDonutChart from "@/components/PortfolioDonutChart";
 import { PortfolioTableFiled, PortfolioSummary as PortfolioSummaryType, ApiResponse } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/utils/auth-fetch";
@@ -223,6 +224,13 @@ export default function PortfolioDashboard() {
         {!isLoading && summary && (
           <>
             <PortfolioSummary summary={summary} currency={currency} exchangeRate={exchangeRate} stocks={stocks} hideNumbers={hideNumbers} />
+
+            {/* Donut Charts */}
+            {stocks.length > 0 && (
+              <div className="mt-6">
+                <PortfolioDonutChart stocks={stocks} hideNumbers={hideNumbers} />
+              </div>
+            )}
 
             {/* Portfolio Table */}
             <div className="mt-8">
