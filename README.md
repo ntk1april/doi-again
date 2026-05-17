@@ -2,9 +2,9 @@
 
 A modern, full-stack web application for tracking your stock portfolio with real-time prices, profit/loss calculations, wishlist management, and market news. Built with Next.js, TypeScript, MongoDB, and modern authentication.
 
-# 🚀 Released Version
+# 🚀 Live Demo
 
-https://doy-again.vercel.app/
+https://doi-again.vercel.app/
 
 ## ✨ Features
 
