@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AuthModalProps {
@@ -9,37 +9,45 @@ interface AuthModalProps {
   initialMode?: "signin" | "signup";
 }
 
-// Mode order for forgot-password: forgot → otp → reset
 type Mode = "signin" | "signup" | "forgot" | "otp" | "reset";
 
 export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: AuthModalProps) {
   const [mode, setMode] = useState<Mode>(initialMode);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    otp: "",
-  });
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  // Store verified email across steps
   const [verifiedEmail, setVerifiedEmail] = useState("");
+  const [verifiedOtp, setVerifiedOtp] = useState("");
+
+  // For real-time password match indicator only
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Refs to read real DOM values (catches browser autofill that bypasses onChange)
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
+  const otpRef = useRef<HTMLInputElement>(null);
+
   const { signIn, signUp } = useAuth();
 
   if (!isOpen) return null;
 
-  const resetForm = () => {
-    setFormData({ name: "", email: "", password: "", confirmPassword: "", otp: "" });
+  const resetAll = () => {
     setError("");
     setSuccessMsg("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   const switchMode = (next: Mode) => {
     setMode(next);
-    resetForm();
+    resetAll();
   };
+
+  const getVal = (ref: React.RefObject<HTMLInputElement | null>) =>
+    ref.current?.value?.trim() ?? "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,73 +56,77 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
     setIsLoading(true);
 
     try {
-      // ─── Sign In ───────────────────────────────────────────────
       if (mode === "signin") {
-        await signIn(formData.email, formData.password);
-        resetForm();
+        const email = getVal(emailRef);
+        const pw = passwordRef.current?.value ?? "";
+        if (!email || !pw) { setError("Email and password are required"); return; }
+        await signIn(email, pw);
+        resetAll();
         onClose();
 
-        // ─── Sign Up ───────────────────────────────────────────────
       } else if (mode === "signup") {
-        if (formData.password !== formData.confirmPassword) {
-          setError("Passwords do not match");
+        const name = getVal(nameRef);
+        const email = getVal(emailRef);
+        const pw = passwordRef.current?.value ?? "";
+        const cpw = confirmPasswordRef.current?.value ?? "";
+
+        if (!name || !email || !pw) { setError("All fields are required"); return; }
+        if (!email.includes("@") || !email.includes(".")) {
+          setError("Please enter a valid email address");
           return;
         }
-        await signUp(formData.name, formData.email, formData.password);
-        resetForm();
+        if (pw.length < 6) { setError("Password must be at least 6 characters"); return; }
+        if (pw !== cpw) { setError("Passwords do not match"); return; }
+
+        await signUp(name, email, pw);
+        resetAll();
         onClose();
 
-        // ─── Forgot Password: send OTP ─────────────────────────────
       } else if (mode === "forgot") {
+        const email = getVal(emailRef);
+        if (!email || !email.includes("@")) { setError("Please enter a valid email address"); return; }
+
         const res = await fetch("/api/auth/send-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: formData.email }),
+          body: JSON.stringify({ email }),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || "Failed to send OTP");
-        setVerifiedEmail(formData.email);
-        setMode("otp");
-        setFormData((prev) => ({ ...prev, otp: "", password: "", confirmPassword: "" }));
-        setError("");
+        setVerifiedEmail(email);
+        switchMode("otp");
 
-        // ─── OTP Verification ──────────────────────────────────────
       } else if (mode === "otp") {
-        if (formData.otp.length !== 6) {
-          setError("Please enter the 6-digit OTP");
-          return;
-        }
-        // Verify OTP on the server
+        const otp = getVal(otpRef);
+        if (otp.length !== 6) { setError("Please enter the 6-digit OTP"); return; }
+
         const res = await fetch("/api/auth/verify-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: verifiedEmail, otp: formData.otp }),
+          body: JSON.stringify({ email: verifiedEmail, otp }),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || "Invalid OTP");
-        // OTP verified — proceed to reset password
-        setMode("reset");
-        setError("");
+        setVerifiedOtp(otp);
+        switchMode("reset");
 
-        // ─── Reset Password ────────────────────────────────────────
       } else if (mode === "reset") {
-        if (formData.password !== formData.confirmPassword) {
-          setError("Passwords do not match");
-          return;
-        }
+        const pw = passwordRef.current?.value ?? "";
+        const cpw = confirmPasswordRef.current?.value ?? "";
+
+        if (pw.length < 6) { setError("Password must be at least 6 characters"); return; }
+        if (pw !== cpw) { setError("Passwords do not match"); return; }
+
         const res = await fetch("/api/auth/reset-password", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: verifiedEmail,
-            otp: formData.otp,
-            newPassword: formData.password,
-          }),
+          body: JSON.stringify({ email: verifiedEmail, otp: verifiedOtp, newPassword: pw }),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || "Failed to reset password");
         setSuccessMsg("Password reset successfully! You can now sign in.");
-        setFormData({ name: "", email: "", password: "", confirmPassword: "", otp: "" });
+        setPassword("");
+        setConfirmPassword("");
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong");
@@ -123,8 +135,8 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
     }
   };
 
-  const passwordsMatch = formData.confirmPassword !== "" && formData.password === formData.confirmPassword;
-  const passwordsMismatch = formData.confirmPassword !== "" && formData.password !== formData.confirmPassword;
+  const passwordsMatch = confirmPassword !== "" && password === confirmPassword;
+  const passwordsMismatch = confirmPassword !== "" && password !== confirmPassword;
 
   const titles: Record<Mode, { heading: string; sub: string }> = {
     signin: { heading: "Welcome Back!", sub: "Sign in to continue to Doi Again" },
@@ -137,15 +149,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative w-full max-w-md mx-4">
-        {/* Close button */}
+        {/* Close */}
         <button
-          onClick={() => { resetForm(); setVerifiedEmail(""); setMode(initialMode); onClose(); }}
+          onClick={() => { resetAll(); setMode(initialMode); onClose(); }}
           className="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl"
-        >
-          ✕
-        </button>
+        >✕</button>
 
-        {/* Modal card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           {/* Header */}
           <div className="text-center mb-6">
@@ -153,26 +162,19 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
             <p className="text-gray-600 text-sm">{titles[mode].sub}</p>
           </div>
 
-          {/* Step indicator for reset flow */}
+          {/* Step indicator */}
           {(mode === "forgot" || mode === "otp" || mode === "reset") && (
             <div className="flex items-center justify-center gap-2 mb-6">
-              {[
-                { label: "Email", step: "forgot" },
-                { label: "OTP", step: "otp" },
-                { label: "Password", step: "reset" },
-              ].map((s, i, arr) => {
-                const stepOrder = ["forgot", "otp", "reset"];
-                const currentIdx = stepOrder.indexOf(mode);
-                const sIdx = stepOrder.indexOf(s.step);
-                const done = sIdx < currentIdx;
-                const active = sIdx === currentIdx;
+              {[{ label: "Email", step: "forgot" }, { label: "OTP", step: "otp" }, { label: "Password", step: "reset" }].map((s, i, arr) => {
+                const order = ["forgot", "otp", "reset"];
+                const cur = order.indexOf(mode);
+                const si = order.indexOf(s.step);
                 return (
                   <div key={s.step} className="flex items-center gap-2">
-                    <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${done ? "bg-green-500 text-white" : active ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"
-                      }`}>
-                      {done ? "✓" : i + 1}
+                    <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${si < cur ? "bg-green-500 text-white" : si === cur ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"}`}>
+                      {si < cur ? "✓" : i + 1}
                     </div>
-                    <span className={`text-xs font-medium ${active ? "text-gray-900" : "text-gray-400"}`}>{s.label}</span>
+                    <span className={`text-xs font-medium ${si === cur ? "text-gray-900" : "text-gray-400"}`}>{s.label}</span>
                     {i < arr.length - 1 && <div className="w-6 h-px bg-gray-300" />}
                   </div>
                 );
@@ -180,73 +182,72 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
             </div>
           )}
 
-          {/* Error / Success */}
-          {error && (
-            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{error}</div>
-          )}
-          {successMsg && (
-            <div className="mb-4 rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-700">{successMsg}</div>
-          )}
+          {/* Alerts */}
+          {error && <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700">{error}</div>}
+          {successMsg && <div className="mb-4 rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-700">{successMsg}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* ── Full Name (signup only) ── */}
+            {/* Full Name */}
             {mode === "signup" && (
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                 <input
-                  id="name" type="text" required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  ref={nameRef}
+                  id="name" name="name" type="text" required
+                  autoComplete="name"
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-black"
                   placeholder="Nanthakorn Kaenkaew"
                 />
               </div>
             )}
 
-            {/* ── Email (signin, signup, forgot) ── */}
+            {/* Email */}
             {(mode === "signin" || mode === "signup" || mode === "forgot") && (
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
                 <input
-                  id="email" type="email" required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  ref={emailRef}
+                  id="email" name="email" type="text" required
+                  autoComplete="email"
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-black"
                   placeholder="nanthakorn@example.com"
                 />
               </div>
             )}
 
-            {/* ── OTP Input ── */}
+            {/* OTP */}
             {mode === "otp" && (
               <div>
                 <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">6-Digit OTP</label>
                 <input
-                  id="otp" type="text" required inputMode="numeric"
-                  maxLength={6} minLength={6}
-                  value={formData.otp}
-                  onChange={(e) => setFormData({ ...formData, otp: e.target.value.replace(/\D/g, "") })}
+                  ref={otpRef}
+                  id="otp" name="otp" type="text" required
+                  inputMode="numeric" maxLength={6} minLength={6}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-2xl font-bold tracking-widest focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-300 text-black"
                   placeholder="••••••"
+                  onInput={(e) => {
+                    const input = e.currentTarget;
+                    input.value = input.value.replace(/\D/g, "").slice(0, 6);
+                  }}
                 />
                 <p className="mt-1 text-xs text-gray-500">Check your email inbox (and spam folder)</p>
               </div>
             )}
 
-            {/* ── Password (signin, signup, reset) ── */}
+            {/* Password */}
             {(mode === "signin" || mode === "signup" || mode === "reset") && (
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                   {mode === "reset" ? "New Password" : "Password"}
                 </label>
                 <input
-                  id="password" type="password" required
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  ref={passwordRef}
+                  id="password" name="password" type="password" required
+                  autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                  minLength={mode === "signin" ? 1 : 6}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-black"
                   placeholder="••••••••"
-                  minLength={mode === "signin" ? 1 : 6}
                 />
                 {mode !== "signin" && (
                   <p className="mt-1 text-xs text-gray-500">Must be at least 6 characters</p>
@@ -254,24 +255,26 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
               </div>
             )}
 
-            {/* ── Confirm Password (signup, reset) ── */}
+            {/* Confirm Password */}
             {(mode === "signup" || mode === "reset") && (
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                   Confirm {mode === "reset" ? "New " : ""}Password
                 </label>
                 <input
-                  id="confirmPassword" type="password" required
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 placeholder-gray-400 text-black ${passwordsMismatch
-                    ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
-                    : passwordsMatch
+                  ref={confirmPasswordRef}
+                  id="confirmPassword" name="confirmPassword" type="password" required
+                  autoComplete="new-password"
+                  minLength={6}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 placeholder-gray-400 text-black ${
+                    passwordsMismatch
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                      : passwordsMatch
                       ? "border-green-400 focus:border-green-500 focus:ring-green-500/20"
                       : "border-gray-300 focus:border-blue-500 focus:ring-blue-500/20"
-                    }`}
+                  }`}
                   placeholder="••••••••"
-                  minLength={6}
                 />
                 {passwordsMismatch && <p className="mt-1 text-xs text-red-500">Passwords do not match</p>}
                 {passwordsMatch && <p className="mt-1 text-xs text-green-600">✓ Passwords match</p>}
@@ -283,17 +286,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
               disabled={isLoading}
               className="w-full rounded-lg bg-gradient-to-r from-red-500 to-green-500 px-4 py-3 font-semibold text-white hover:from-red-700 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              {isLoading ? "Loading..." : {
-                signin: "Sign In",
-                signup: "Create Account",
-                forgot: "Send OTP",
-                otp: "Verify OTP",
-                reset: "Reset Password",
-              }[mode]}
+              {isLoading ? "Loading..." : ({ signin: "Sign In", signup: "Create Account", forgot: "Send OTP", otp: "Verify OTP", reset: "Reset Password" } as Record<Mode, string>)[mode]}
             </button>
           </form>
 
-          {/* Footer links */}
+          {/* Footer */}
           <div className="mt-6 text-center space-y-2">
             {mode === "signin" && (
               <>
@@ -323,7 +320,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
                 Go to Sign In →
               </button>
             )}
-            {/* Resend OTP */}
             {mode === "otp" && (
               <p className="text-sm text-gray-500">
                 Didn&apos;t receive it?{" "}
@@ -339,9 +335,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
                     setTimeout(() => setSuccessMsg(""), 3000);
                   }}
                   className="font-semibold text-orange-500 hover:text-orange-700"
-                >
-                  Resend OTP
-                </button>
+                >Resend OTP</button>
               </p>
             )}
           </div>

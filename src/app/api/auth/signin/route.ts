@@ -8,7 +8,8 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const { email, password } = body;
+    const { email: rawEmail, password } = body;
+    const email = rawEmail?.trim();
 
     // Validation
     if (!email || !password) {

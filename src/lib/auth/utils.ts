@@ -48,11 +48,15 @@ export function verifyToken(token: string): UserPayload | null {
 }
 
 /**
- * Validate email format
+ * Validate email format — checks for presence of @ and a dot after it
  */
 export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  if (!email) return false;
+  const trimmed = email.trim();
+  const atIdx = trimmed.indexOf("@");
+  if (atIdx < 1) return false;                         // must have chars before @
+  const domain = trimmed.slice(atIdx + 1);
+  return domain.includes(".") && domain.length >= 3;   // e.g. "t.co"
 }
 
 /**

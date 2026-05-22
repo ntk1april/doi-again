@@ -1,42 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db/connection";
 import { User } from "@/lib/db/userModel";
-import { hashPassword, generateToken, isValidEmail, isValidPassword } from "@/lib/auth/utils";
+import { hashPassword, generateToken } from "@/lib/auth/utils";
 
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
     const body = await request.json();
-    const { email, password, name } = body;
+    const { email: rawEmail, password, name } = body;
+    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
 
-    // Validation
-    if (!email || !password || !name) {
+    console.log("[signup]", { name, email, passwordLen: password?.length });
+
+    if (!name || !email || !password) {
       return NextResponse.json(
         { success: false, error: "All fields are required" },
         { status: 400 }
       );
     }
 
-    if (!isValidEmail(email)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid email format" },
-        { status: 400 }
-      );
-    }
-
-    if (!isValidPassword(password)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number",
-        },
-        { status: 400 }
-      );
-    }
-
     // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
         { success: false, error: "Email already registered" },
@@ -44,12 +29,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
+    // Hash password and create user
     const hashedPassword = await hashPassword(password);
-
-    // Create user
     const user = await User.create({
-      email: email.toLowerCase(),
+      email,
       password: hashedPassword,
       name: name.trim(),
     });
@@ -61,7 +44,6 @@ export async function POST(request: NextRequest) {
       name: user.name,
     });
 
-    // Return success with token
     return NextResponse.json(
       {
         success: true,
