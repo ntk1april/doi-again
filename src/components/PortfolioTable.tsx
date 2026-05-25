@@ -10,7 +10,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PortfolioTableFiled } from "@/types";
-import { formatCurrency, formatPercent, formatNumber } from "@/lib/utils/calculations";
+import {
+  formatCurrency,
+  formatPercent,
+  formatNumber,
+} from "@/lib/utils/calculations";
 import StockLogo from "./StockLogo";
 
 interface Props {
@@ -20,12 +24,26 @@ interface Props {
   hideNumbers?: boolean;
 }
 
-type SortField = "symbol" | "units" | "avgPrice" | "currentPrice" | "totalCost" | "currentValue" | "unrealizedPnl" | "realizedPnl" | "netPnl";
+type SortField =
+  | "symbol"
+  | "units"
+  | "avgPrice"
+  | "currentPrice"
+  | "totalCost"
+  | "currentValue"
+  | "unrealizedPnl"
+  | "realizedPnl"
+  | "netPnl";
 type SortDirection = "asc" | "desc";
 
 const HIDDEN = "••••••";
 
-export default function PortfolioTable({ stocks, currency, exchangeRate, hideNumbers = false }: Props) {
+export default function PortfolioTable({
+  stocks,
+  currency,
+  exchangeRate,
+  hideNumbers = false,
+}: Props) {
   const router = useRouter();
   const [sortField, setSortField] = useState<SortField>("symbol");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -41,9 +59,16 @@ export default function PortfolioTable({ stocks, currency, exchangeRate, hideNum
       <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
         <p className="text-gray-600">
           No stocks in portfolio yet.{" "}
-          <Link href="/portfolio/add" className="font-medium text-blue-600 hover:underline">
+          <Link
+            href="/portfolio/add"
+            className="font-medium text-blue-600 hover:underline"
+          >
             Add your first stock
           </Link>
+        </p>
+        <p className="text-gray-600">
+          Or if you're in Custom Tab, click on &quot;✏️ Manage Port&quot; to add
+          stocks to your tab.
         </p>
       </div>
     );
@@ -230,17 +255,23 @@ export default function PortfolioTable({ stocks, currency, exchangeRate, hideNum
 
                 {/* Current Price */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {mask(formatCurrency(convertValue(stock.currentPrice), currency))}
+                  {mask(
+                    formatCurrency(convertValue(stock.currentPrice), currency),
+                  )}
                 </td>
 
                 {/* Total Cost */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {mask(formatCurrency(convertValue(stock.totalCost), currency))}
+                  {mask(
+                    formatCurrency(convertValue(stock.totalCost), currency),
+                  )}
                 </td>
 
                 {/* Current Value */}
                 <td className="px-4 py-3 text-right text-gray-700">
-                  {mask(formatCurrency(convertValue(stock.currentValue), currency))}
+                  {mask(
+                    formatCurrency(convertValue(stock.currentValue), currency),
+                  )}
                 </td>
 
                 {/* Unrealized P/L */}
@@ -249,7 +280,12 @@ export default function PortfolioTable({ stocks, currency, exchangeRate, hideNum
                 >
                   {formatPercent(stock.unrealizedPnlPercent)}
                   <div className="text-xs text-gray-500 font-normal">
-                    {mask(formatCurrency(convertValue(stock.unrealizedPnl), currency))}
+                    {mask(
+                      formatCurrency(
+                        convertValue(stock.unrealizedPnl),
+                        currency,
+                      ),
+                    )}
                   </div>
                 </td>
 
@@ -257,7 +293,7 @@ export default function PortfolioTable({ stocks, currency, exchangeRate, hideNum
                 <td
                   className={`px-4 py-3 text-right font-medium ${isRealizedProfit ? "text-green-600" : "text-red-600"}`}
                 >
-                  {(formatCurrency(convertValue(stock.realizedPnl), currency))}
+                  {formatCurrency(convertValue(stock.realizedPnl), currency)}
                 </td>
 
                 {/* Net P/L */}

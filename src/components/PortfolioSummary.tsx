@@ -22,7 +22,13 @@ interface Props {
   hideNumbers?: boolean;
 }
 
-export default function PortfolioSummary({ summary, currency, exchangeRate, stocks = [], hideNumbers = false }: Props) {
+export default function PortfolioSummary({
+  summary,
+  currency,
+  exchangeRate,
+  stocks = [],
+  hideNumbers = false,
+}: Props) {
   const isProfit = summary.netPnl >= 0;
 
   const convertValue = (value: number) => {
@@ -32,13 +38,23 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
   const mask = (formatted: string) => (hideNumbers ? HIDDEN : formatted);
 
   // Find top gainer and top loser
-  const topGainer = stocks.length > 0
-    ? stocks.reduce((max, stock) => stock.netPnlPercent > max.netPnlPercent ? stock : max, stocks[0])
-    : null;
+  const topGainer =
+    stocks.length > 0
+      ? stocks.reduce(
+          (max, stock) =>
+            stock.netPnlPercent > max.netPnlPercent ? stock : max,
+          stocks[0],
+        )
+      : null;
 
-  const topLoser = stocks.length > 0
-    ? stocks.reduce((min, stock) => stock.netPnlPercent < min.netPnlPercent ? stock : min, stocks[0])
-    : null;
+  const topLoser =
+    stocks.length > 0
+      ? stocks.reduce(
+          (min, stock) =>
+            stock.netPnlPercent < min.netPnlPercent ? stock : min,
+          stocks[0],
+        )
+      : null;
 
   return (
     <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
@@ -62,16 +78,18 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
       <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
         <p className="text-sm font-medium text-gray-600">Net P/L 💰</p>
         <p
-          className={`mt-2 text-2xl font-bold ${isProfit ? "text-green-600" : "text-red-600"
-            }`}
-        >
-          {mask(formatCurrency(convertValue(summary.netPnl), currency))}
-        </p>
-        <p
-          className={`mt-1 text-sm font-medium ${isProfit ? "text-green-600" : "text-red-600"
-            }`}
+          className={`mt-2 text-2xl font-bold ${
+            isProfit ? "text-green-600" : "text-red-600"
+          }`}
         >
           {formatPercent(summary.netPnlPercent)}
+        </p>
+        <p
+          className={`mt-1 text-sm font-medium ${
+            isProfit ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {mask(formatCurrency(convertValue(summary.netPnl), currency))}
         </p>
       </div>
 
@@ -88,7 +106,9 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
                 {formatPercent(topGainer.netPnlPercent)}
               </p>
               <p className="mt-1 text-sm font-medium text-green-600">
-                ({mask(formatCurrency(convertValue(topGainer.netPnl), currency))})
+                (
+                {mask(formatCurrency(convertValue(topGainer.netPnl), currency))}
+                )
               </p>
             </div>
           </>
@@ -110,7 +130,8 @@ export default function PortfolioSummary({ summary, currency, exchangeRate, stoc
                 {formatPercent(topLoser.netPnlPercent)}
               </p>
               <p className="mt-1 text-sm font-medium text-red-600">
-                ({mask(formatCurrency(convertValue(topLoser.netPnl), currency))})
+                ({mask(formatCurrency(convertValue(topLoser.netPnl), currency))}
+                )
               </p>
             </div>
           </>

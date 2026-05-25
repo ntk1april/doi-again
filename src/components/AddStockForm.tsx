@@ -36,7 +36,9 @@ export default function StockForm({
   const [units, setUnits] = useState("");
   const [price, setPrice] = useState("");
   const [error, setError] = useState("");
-  const [suggestions, setSuggestions] = useState<{ symbol: string; name: string; logo: string }[]>([]);
+  const [suggestions, setSuggestions] = useState<
+    { symbol: string; name: string; logo: string }[]
+  >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -51,7 +53,10 @@ export default function StockForm({
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node)) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node)
+      ) {
         setShowSuggestions(false);
       }
     };
@@ -68,7 +73,9 @@ export default function StockForm({
 
     setSearchLoading(true);
     try {
-      const response = await fetch(`/api/search-stocks?q=${encodeURIComponent(query)}`);
+      const response = await fetch(
+        `/api/search-stocks?q=${encodeURIComponent(query)}`,
+      );
       const data = await response.json();
       setSuggestions(data.results || []);
       setShowSuggestions(true);
@@ -142,7 +149,10 @@ export default function StockForm({
 
       {/* Symbol */}
       <div>
-        <label htmlFor="symbol" className="block text-sm font-bold text-gray-700">
+        <label
+          htmlFor="symbol"
+          className="block text-sm font-bold text-gray-700"
+        >
           Stock Symbol
         </label>
         <div className="relative">
@@ -151,16 +161,25 @@ export default function StockForm({
             type="text"
             value={symbol}
             onChange={(e) => handleSymbolChange(e.target.value)}
-            onFocus={() => symbol.length > 0 && suggestions.length > 0 && setShowSuggestions(true)}
+            onFocus={() =>
+              symbol.length > 0 &&
+              suggestions.length > 0 &&
+              setShowSuggestions(true)
+            }
             readOnly={readOnlySymbol}
-            placeholder="e.g., MSFT"
+            placeholder="e.g., GOOGL"
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none"
             disabled={isLoading || readOnlySymbol}
             autoComplete="off"
           />
           {searchLoading && (
             <div className="absolute right-3 top-3 text-gray-400">
-              <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg
+                className="h-5 w-5 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
@@ -178,11 +197,11 @@ export default function StockForm({
                   className="w-full text-left px-3 py-3 hover:bg-blue-50 border-b border-gray-200 last:border-b-0 flex items-center gap-3"
                 >
                   <StockLogo symbol={item.symbol} size="md" />
-                  <div className="flex-1 min-w-0"
-                    title={item.name}
-                  >
+                  <div className="flex-1 min-w-0" title={item.name}>
                     <div className="font-medium text-black">{item.symbol}</div>
-                    <div className="text-sm text-gray-500 truncate">{item.name}</div>
+                    <div className="text-sm text-gray-500 truncate">
+                      {item.name}
+                    </div>
                   </div>
                   <button
                     onClick={(e) => handleRowClick(item.symbol, e)}
@@ -194,17 +213,23 @@ export default function StockForm({
               ))}
             </div>
           )}
-          {showSuggestions && symbol.length > 0 && suggestions.length === 0 && !searchLoading && (
-            <div className="absolute top-full left-0 right-0 z-10 mt-1 rounded-md border border-gray-300 bg-white shadow-lg p-3 text-gray-500">
-              No stocks found. Try another search.
-            </div>
-          )}
+          {showSuggestions &&
+            symbol.length > 0 &&
+            suggestions.length === 0 &&
+            !searchLoading && (
+              <div className="absolute top-full left-0 right-0 z-10 mt-1 rounded-md border border-gray-300 bg-white shadow-lg p-3 text-gray-500">
+                No stocks found. Try another search.
+              </div>
+            )}
         </div>
       </div>
 
       {/* Units */}
       <div>
-        <label htmlFor="units" className="block text-sm font-bold text-gray-700">
+        <label
+          htmlFor="units"
+          className="block text-sm font-bold text-gray-700"
+        >
           Units
         </label>
         <input
@@ -222,7 +247,10 @@ export default function StockForm({
 
       {/* Price */}
       <div>
-        <label htmlFor="price" className="block text-sm font-bold text-gray-700">
+        <label
+          htmlFor="price"
+          className="block text-sm font-bold text-gray-700"
+        >
           Price (USD)
         </label>
         <input

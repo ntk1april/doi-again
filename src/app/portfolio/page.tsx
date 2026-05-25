@@ -5,12 +5,13 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PortfolioSummary from "@/components/PortfolioSummary";
 import PortfolioTable from "@/components/PortfolioTable";
 import PortfolioDonutChart from "@/components/PortfolioDonutChart";
+import PortfolioTabBar, { PortfolioTab, ALL_TAB_ID } from "@/components/PortfolioTabBar";
 import { PortfolioTableFiled, PortfolioSummary as PortfolioSummaryType, ApiResponse } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/utils/auth-fetch";
@@ -42,11 +43,18 @@ export default function PortfolioDashboard() {
   const [error, setError] = useState("");
   const [currentQuote, setCurrentQuote] = useState<Quote>(investorQuotes[0]);
   const [currency, setCurrency] = useState<"USD" | "THB">("USD");
-  const [exchangeRate, setExchangeRate] = useState(31.45); // Default fallback
+  const [exchangeRate, setExchangeRate] = useState(31.45);
   const [hideNumbers, setHideNumbers] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const { user, signOut, isLoading: authLoading } = useAuth();
   const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [tabs, setTabs] = useState<PortfolioTab[]>([
+    { id: ALL_TAB_ID, name: "All Stocks", symbols: [] },
+  ]);
+  const [activeTabId, setActiveTabId] = useState<string>(ALL_TAB_ID);
+  const [tabsLoaded, setTabsLoaded] = useState(false);
 
   useEffect(() => {
     // Redirect to home if not authenticated
@@ -58,8 +66,85 @@ export default function PortfolioDashboard() {
     if (user) {
       fetchPortfolio();
       fetchExchangeRate();
+      fetchTabs();
     }
   }, [user, authLoading, router]);
+
+  // ── Load tabs from DB ───────────────────────────────────
+  const fetchTabs = async () => {
+    try {
+      const res = await authFetch("/api/portfolio/tabs");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+        const saved: PortfolioTab[] = data.data;
+        const hasAll = saved.some((t) => t.id === ALL_TAB_ID);
+        setTabs(
+          hasAll
+            ? saved
+            : [{ id: ALL_TAB_ID, name: "All Stocks", symbols: [] }, ...saved]
+        );
+      }
+    } catch {
+      // If loading fails just keep the default All tab
+    } finally {
+      setTabsLoaded(true);
+    }
+  };
+
+  // ── Save tabs to DB (debounced 800ms) ─────────────────────
+  useEffect(() => {
+    if (!tabsLoaded) return; // don't save on initial load
+    const timer = setTimeout(() => {
+      authFetch("/api/portfolio/tabs", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tabs }),
+      }).catch(() => {}); // fire-and-forget
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [tabs, tabsLoaded]);
+
+  // ── Tab handlers ────────────────────────────────────────────
+  const handleTabAdd = () => {
+    const id = `tab-${Date.now()}`;
+    const newTab: PortfolioTab = { id, name: `Group ${tabs.length}`, symbols: [] };
+    setTabs((prev) => [...prev, newTab]);
+    setActiveTabId(id);
+  };
+  const handleTabRename = (id: string, name: string) =>
+    setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, name } : t)));
+  const handleTabDelete = (id: string) => {
+    setTabs((prev) => prev.filter((t) => t.id !== id));
+    if (activeTabId === id) setActiveTabId(ALL_TAB_ID);
+  };
+  const handleTabSymbolsChange = (id: string, symbols: string[]) =>
+    setTabs((prev) => prev.map((t) => (t.id === id ? { ...t, symbols } : t)));
+
+  // ── Filtered stocks + summary for active tab ─────────────────
+  const activeTab = tabs.find((t) => t.id === activeTabId);
+  const filteredStocks = useMemo(() => {
+    if (!activeTab || activeTab.id === ALL_TAB_ID) return stocks;
+    return stocks.filter((s) => activeTab.symbols.includes(s.symbol));
+  }, [stocks, activeTab]);
+
+  const filteredSummary = useMemo((): PortfolioSummaryType | null => {
+    if (!summary) return null;
+    if (!activeTab || activeTab.id === ALL_TAB_ID) return summary;
+    const invested = filteredStocks.reduce((s, st) => s + st.totalCost, 0);
+    const currentVal = filteredStocks.reduce((s, st) => s + st.currentValue, 0);
+    const unrealized = filteredStocks.reduce((s, st) => s + st.unrealizedPnl, 0);
+    const realized = filteredStocks.reduce((s, st) => s + st.realizedPnl, 0);
+    const net = unrealized + realized;
+    return {
+      totalInvested: invested,
+      currentValue: currentVal,
+      unrealizedPnl: unrealized,
+      realizedPnl: realized,
+      netPnl: net,
+      netPnlPercent: invested > 0 ? (net / invested) * 100 : 0,
+    };
+  }, [summary, activeTab, filteredStocks]);
+
 
   // Rotate quotes every 10 seconds
   useEffect(() => {
@@ -220,21 +305,33 @@ export default function PortfolioDashboard() {
           </div>
         )}
 
-        {/* Portfolio Summary */}
-        {!isLoading && summary && (
+        {/* Portfolio Tabs + Content */}
+        {!isLoading && filteredSummary && (
           <>
-            <PortfolioSummary summary={summary} currency={currency} exchangeRate={exchangeRate} stocks={stocks} hideNumbers={hideNumbers} />
+            {/* Tab Bar */}
+            <PortfolioTabBar
+              tabs={tabs}
+              activeTabId={activeTabId}
+              allSymbols={stocks.map((s) => s.symbol)}
+              onTabChange={setActiveTabId}
+              onTabAdd={handleTabAdd}
+              onTabRename={handleTabRename}
+              onTabDelete={handleTabDelete}
+              onTabSymbolsChange={handleTabSymbolsChange}
+            />
+
+            <PortfolioSummary summary={filteredSummary} currency={currency} exchangeRate={exchangeRate} stocks={filteredStocks} hideNumbers={hideNumbers} />
 
             {/* Donut Charts */}
-            {stocks.length > 0 && (
+            {filteredStocks.length > 0 && (
               <div className="mt-6">
-                <PortfolioDonutChart stocks={stocks} hideNumbers={hideNumbers} />
+                <PortfolioDonutChart stocks={filteredStocks} hideNumbers={hideNumbers} />
               </div>
             )}
 
             {/* Portfolio Table */}
             <div className="mt-8">
-              <PortfolioTable stocks={stocks} currency={currency} exchangeRate={exchangeRate} hideNumbers={hideNumbers} />
+              <PortfolioTable stocks={filteredStocks} currency={currency} exchangeRate={exchangeRate} hideNumbers={hideNumbers} />
             </div>
           </>
         )}

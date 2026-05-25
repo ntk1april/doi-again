@@ -122,6 +122,27 @@ const wishlistSchema = new Schema(
 // Compound index: userId + symbol must be unique
 wishlistSchema.index({ userId: 1, symbol: 1 }, { unique: true });
 
+// Portfolio Tab Groups Schema (one doc per user)
+const portfolioTabGroupSchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true, // one doc per user
+      index: true,
+    },
+    tabs: [
+      {
+        id: { type: String, required: true },
+        name: { type: String, required: true },
+        symbols: [{ type: String, uppercase: true, trim: true }],
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
 // Get or create models
 const PortfolioStock: Model<Document> =
   mongoose.models.PortfolioStock ||
@@ -135,4 +156,8 @@ const Wishlist: Model<Document> =
   mongoose.models.Wishlist ||
   mongoose.model("Wishlist", wishlistSchema);
 
-export { PortfolioStock, Transaction, Wishlist };
+const PortfolioTabGroup: Model<Document> =
+  mongoose.models.PortfolioTabGroup ||
+  mongoose.model("PortfolioTabGroup", portfolioTabGroupSchema);
+
+export { PortfolioStock, Transaction, Wishlist, PortfolioTabGroup };
