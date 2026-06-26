@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { ApiResponse } from "@/types";
 import { getStockDetails } from "@/lib/utils/stockDetails";
 

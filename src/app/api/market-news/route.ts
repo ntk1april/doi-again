@@ -10,7 +10,7 @@ export async function GET() {
   if (!FINNHUB_API_KEY) {
     return NextResponse.json(
       { success: false, error: "API key not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -18,7 +18,7 @@ export async function GET() {
     // Fetch general market news from Finnhub
     const response = await fetch(
       `https://finnhub.io/api/v1/news?category=general&token=${FINNHUB_API_KEY}`,
-      { next: { revalidate: 300 } } // Cache for 5 minutes
+      { next: { revalidate: 300 } }, // Cache for 5 minutes
     );
 
     if (!response.ok) {
@@ -35,7 +35,7 @@ export async function GET() {
     console.error("Error fetching market news:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch market news" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

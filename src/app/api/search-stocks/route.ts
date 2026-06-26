@@ -15,7 +15,7 @@ async function searchWithFinnhub(query: string) {
   try {
     const response = await fetch(
       `https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=${FINNHUB_API_KEY}`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600 } },
     );
 
     if (!response.ok) {
@@ -51,7 +51,7 @@ async function searchWithAlphaVantage(query: string) {
   try {
     const response = await fetch(
       `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${ALPHAVANTAGE_API_KEY}`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600 } },
     );
 
     if (!response.ok) {
@@ -68,7 +68,10 @@ async function searchWithAlphaVantage(query: string) {
     const data = await response.json();
 
     if (data["Error Message"] || data["Note"]) {
-      console.error("Alpha Vantage API message:", data["Error Message"] || data["Note"]);
+      console.error(
+        "Alpha Vantage API message:",
+        data["Error Message"] || data["Note"],
+      );
       return null;
     }
 
@@ -96,7 +99,7 @@ export async function GET(request: NextRequest) {
 
   // Try Finnhub first (more reliable for free tier)
   let results = await searchWithFinnhub(query);
-  
+
   // Fallback to Alpha Vantage if Finnhub fails
   if (!results) {
     results = await searchWithAlphaVantage(query);

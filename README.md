@@ -1,4 +1,4 @@
-# Stock Portfolio Tracker - Doy Again 📉
+# Stock Portfolio Tracker - Doi Again 📉
 
 A modern, full-stack web application for tracking your stock portfolio with real-time prices, profit/loss calculations, wishlist management, and market news. Built with Next.js, TypeScript, MongoDB, and modern authentication.
 
@@ -110,11 +110,13 @@ https://doi-again.vercel.app/
 4. **Get API Keys (Optional)**
 
    **Finnhub (Recommended - Primary API):**
+
    - Visit: https://finnhub.io/register
    - Free tier: 60 calls/minute
    - Fast and reliable
 
    **Alpha Vantage (Fallback API):**
+
    - Visit: https://www.alphavantage.co/support/#api-key
    - Free tier: 5 calls/minute, 500/day
    - Automatic fallback if Finnhub fails
@@ -134,11 +136,13 @@ https://doi-again.vercel.app/
 ### First Time Setup
 
 1. **Create an Account**
+
    - Click "Sign Up" on the sign-in page
    - Enter your name, email, and password
    - Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number
 
 2. **Add Your First Stock**
+
    - Click "+ Add Stock" button
    - Search for a stock symbol (e.g., AAPL, MSFT, NVDA)
    - Enter the number of units and purchase price
@@ -306,11 +310,13 @@ Net P/L = Unrealized P/L + Realized P/L
 The app uses a multi-API approach for reliability:
 
 1. **Stock Search:**
+
    - Try Finnhub first (60 calls/min)
    - Fallback to Alpha Vantage (5 calls/min)
    - If both fail, manual symbol entry still works
 
 2. **Real-time Prices:**
+
    - Try Finnhub first (fast, reliable)
    - Fallback to Alpha Vantage
    - If both fail, use your average purchase price

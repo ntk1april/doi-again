@@ -12,14 +12,14 @@ export async function GET(request: NextRequest) {
   if (!symbol) {
     return NextResponse.json(
       { success: false, error: "Symbol is required" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (!FINNHUB_API_KEY) {
     return NextResponse.json(
       { success: false, error: "API key not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     // Fetch quote from Finnhub
     const response = await fetch(
       `https://finnhub.io/api/v1/quote?symbol=${symbol.toUpperCase()}&token=${FINNHUB_API_KEY}`,
-      { next: { revalidate: 30 } } // Cache for 30 seconds
+      { next: { revalidate: 30 } }, // Cache for 30 seconds
     );
 
     if (!response.ok) {
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     // Convert to EST/EDT (UTC-5 or UTC-4)
     // For simplicity, using UTC-5 (EST)
-    const estTime = utcTime - (5 * 60);
+    const estTime = utcTime - 5 * 60;
     const estHours = Math.floor(estTime / 60) % 24;
     const estMinutes = estTime % 60;
 
@@ -52,11 +52,18 @@ export async function GET(request: NextRequest) {
     let isMarketOpen = false;
 
     // Pre-market: 4:00 AM - 9:30 AM EST
-    if ((estHours === 4 && estMinutes >= 0) || (estHours > 4 && estHours < 9) || (estHours === 9 && estMinutes < 30)) {
+    if (
+      (estHours === 4 && estMinutes >= 0) ||
+      (estHours > 4 && estHours < 9) ||
+      (estHours === 9 && estMinutes < 30)
+    ) {
       marketStatus = "pre-market";
     }
     // Regular hours: 9:30 AM - 4:00 PM EST
-    else if ((estHours === 9 && estMinutes >= 30) || (estHours > 9 && estHours < 16)) {
+    else if (
+      (estHours === 9 && estMinutes >= 30) ||
+      (estHours > 9 && estHours < 16)
+    ) {
       marketStatus = "regular";
       isMarketOpen = true;
     }
@@ -92,7 +99,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching stock price:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch stock price" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
