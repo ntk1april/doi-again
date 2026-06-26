@@ -108,8 +108,8 @@ function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHo
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative">
-        <svg width="270" height="270" viewBox="0 0 270 270">
+      <div className="relative w-full max-w-[200px] sm:max-w-[270px]">
+        <svg width="100%" viewBox="0 0 270 270">
           {segments.map((seg) => {
             const isActive = hoveredSymbol === null || hoveredSymbol === seg.label;
             return (
@@ -132,12 +132,8 @@ function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHo
           </text>
           <text x={cx} y={cy + 10} textAnchor="middle" fill="#6B7280" fontSize="11">
             {hovered
-              ? hideNumbers
-                ? "••••••"
-                : formatValue(hovered.value)
-              : hideNumbers
-                ? "••••••"
-                : formatValue(total)}
+              ? hideNumbers ? "••••••" : formatValue(hovered.value)
+              : hideNumbers ? "••••••" : formatValue(total)}
           </text>
           {hovered && (
             <text x={cx} y={cy + 25} textAnchor="middle" fill="#9CA3AF" fontSize="10">
@@ -175,9 +171,9 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900 mb-6">Portfolio Allocation</h2>
 
-      <div className="flex flex-col lg:flex-row gap-8 items-start">
-        {/* Charts */}
-        <div className="flex flex-wrap gap-8 justify-center flex-shrink-0">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        {/* Charts — side by side on sm+, stacked on xs */}
+        <div className="flex flex-wrap gap-4 sm:gap-8 justify-center w-full lg:w-auto flex-shrink-0">
           <DonutChart
             data={unitData}
             label="By Units"

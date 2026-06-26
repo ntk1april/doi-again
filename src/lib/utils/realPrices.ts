@@ -4,9 +4,9 @@
  * Fallback: Alpha Vantage API (https://www.alphavantage.co/)
  */
 
-// Cache prices for 5 minutes to avoid hitting rate limits
+// Cache prices for 60 seconds (matches /api/stock-price revalidation)
 const priceCache: Record<string, { price: number; timestamp: number }> = {};
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 60 * 1000; // 60 seconds
 
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 const ALPHAVANTAGE_API_KEY = process.env.ALPHAVANTAGE_API_KEY;
@@ -23,7 +23,7 @@ async function getPriceFromFinnhub(symbol: string): Promise<number | null> {
   try {
     const response = await fetch(
       `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
-      { next: { revalidate: 60 } }
+      { next: { revalidate: 30 } }, // Match stock-price API cache
     );
 
     if (!response.ok) {
@@ -48,7 +48,9 @@ async function getPriceFromFinnhub(symbol: string): Promise<number | null> {
  * Fetch price from Alpha Vantage API
  * Free tier: 5 requests/minute, 500 requests/day
  */
-async function getPriceFromAlphaVantage(symbol: string): Promise<number | null> {
+async function getPriceFromAlphaVantage(
+  symbol: string,
+): Promise<number | null> {
   if (!ALPHAVANTAGE_API_KEY || ALPHAVANTAGE_API_KEY === "demo") {
     return null;
   }
@@ -56,7 +58,7 @@ async function getPriceFromAlphaVantage(symbol: string): Promise<number | null> 
   try {
     const response = await fetch(
       `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHAVANTAGE_API_KEY}`,
-      { next: { revalidate: 60 } }
+      { next: { revalidate: 60 } },
     );
 
     if (!response.ok) {
@@ -107,7 +109,7 @@ export async function getRealStockPrice(symbol: string): Promise<number> {
   // If both APIs fail, throw error to use fallback (avgPrice)
   if (!price) {
     throw new Error(
-      `Unable to fetch price for ${upperSymbol}. APIs not configured or unavailable.`
+      `Unable to fetch price for ${upperSymbol}. APIs not configured or unavailable.`,
     );
   }
 

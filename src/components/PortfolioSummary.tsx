@@ -57,7 +57,7 @@ export default function PortfolioSummary({
       : null;
 
   return (
-    <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
+    <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
       {/* Total Invested */}
       <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
         <p className="text-sm font-medium text-gray-600">Total Invested 💵</p>

@@ -214,8 +214,8 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Search Bar - Available for everyone */}
-          <div className="flex-1 max-w-md mx-4" ref={searchRef}>
+          {/* Search Bar */}
+          <div className="flex-1 min-w-0 max-w-xs sm:max-w-md mx-2 sm:mx-4" ref={searchRef}>
             <div className="relative">
               <input
                 type="text"
@@ -297,47 +297,35 @@ export default function Navbar() {
                 )}
               </button>
             )}
-            {/* Mobile menu */}
+            {/* Mobile dropdown — renders below navbar */}
             {user && showMobileMenu && (
-              <div className="absolute top-full left-0 right-0 mt-2 rounded-lg border border-gray-200 bg-white shadow-xl max-h-96 overflow-y-auto">
-                {/* Mobile menu links */}
-                <div className="flex flex-col gap-2 p-4">
-                  <Link
-                    href="/portfolio"
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/portfolio"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
+              <div className="fixed top-16 left-0 right-0 z-50 border-t border-white/20 bg-white shadow-xl">
+                <div className="flex flex-col p-3">
+                  {[
+                    { href: "/portfolio", label: "Portfolio 💼", match: pathname === "/portfolio" },
+                    { href: "/wishlist",  label: "Wishlist 🔖",  match: pathname?.startsWith("/wishlist") },
+                    { href: "/history",  label: "History 📜",   match: pathname === "/history" },
+                    { href: "/news",     label: "News 📰",      match: pathname === "/news" },
+                  ].map(({ href, label, match }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                        match ? "bg-blue-50 text-blue-600" : "text-gray-700 hover:bg-gray-100"
                       }`}
-                  >
-                    Portfolio
-                  </Link>
-                  <Link
-                    href="/wishlist"
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/wishlist"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                  >
-                    Wishlist
-                  </Link>
-                  <Link
-                    href="/history"
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/history"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                  >
-                    History
-                  </Link>
-                  <Link
-                    href="/news"
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/news"
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                  >
-                    News
-                  </Link>
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                  <div className="border-t border-gray-100 mt-2 pt-2">
+                    <button
+                      onClick={() => { signOut(); setShowMobileMenu(false); }}
+                      className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

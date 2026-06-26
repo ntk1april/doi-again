@@ -254,8 +254,8 @@ export default function StockDetailPage() {
       <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <StockLogo symbol={symbol} size="lg" />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">{symbol}</h1>
@@ -264,26 +264,26 @@ export default function StockDetailPage() {
                 )}
               </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               {/* Wishlist Button */}
               {checkingStatus ? (
                 <button
                   disabled
-                  className="rounded-md bg-gray-400 px-4 py-2 font-medium text-white cursor-not-allowed"
+                  className="rounded-md bg-gray-400 px-4 py-2 font-medium text-white cursor-not-allowed w-full sm:w-auto"
                 >
                   Loading...
                 </button>
               ) : isInWishlist ? (
                 <button
                   onClick={handleRemoveFromWishlist}
-                  className="rounded-md bg-red-500 px-4 py-2 font-medium text-white hover:bg-red-700"
+                  className="rounded-md bg-red-500 px-4 py-2 font-medium text-white hover:bg-red-700 w-full sm:w-auto"
                 >
                   🗑️ Remove from Wishlist
                 </button>
               ) : (
                 <button
                   onClick={handleAddToWishlist}
-                  className="rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-700"
+                  className="rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-700 w-full sm:w-auto"
                 >
                   ⭐ Add to Wishlist
                 </button>
@@ -293,7 +293,7 @@ export default function StockDetailPage() {
               {isInPortfolio ? (
                 <Link
                   href={`/portfolio/edit/${symbol}`}
-                  className="rounded-md bg-green-500 px-4 py-2 font-medium text-white hover:bg-green-700"
+                  className="rounded-md bg-green-500 px-4 py-2 font-medium text-white hover:bg-green-700 w-full sm:w-auto text-center"
                 >
                   📊 Buy/Sell More
                 </Link>
@@ -307,7 +307,7 @@ export default function StockDetailPage() {
                       router.push(`/portfolio/add?symbol=${symbol}`);
                     }
                   }}
-                  className="rounded-md bg-green-500 px-4 py-2 font-medium text-white hover:bg-green-700"
+                  className="rounded-md bg-green-500 px-4 py-2 font-medium text-white hover:bg-green-700 w-full sm:w-auto"
                 >
                   📊 Add to Portfolio
                 </button>
@@ -318,14 +318,14 @@ export default function StockDetailPage() {
           {/* Current Price Card */}
           {quote && (
             <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Current Price</p>
                   <p className="text-4xl font-bold text-gray-900">
                     ${quote.c?.toFixed(2) || "N/A"}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="sm:text-right">
                   <p className={`text-2xl font-semibold ${quote.d >= 0 ? "text-green-600" : "text-red-600"}`}>
                     {quote.d >= 0 ? "+" : ""}{quote.d?.toFixed(2)} ({quote.dp?.toFixed(2)}%)
                   </p>
@@ -657,7 +657,8 @@ export default function StockDetailPage() {
               </div>
             ) : news.length > 0 ? (
               <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-                <table className="w-full">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
@@ -713,7 +714,8 @@ export default function StockDetailPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             ) : (
               <div className="text-center py-12 bg-gray-50 rounded-lg">

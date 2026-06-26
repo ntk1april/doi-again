@@ -6,7 +6,18 @@ export default function NewsPage() {
   const [allNews, setAllNews] = useState<any[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"card" | "list">(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("news-view") as "card" | "list") || "card";
+    }
+    return "card";
+  });
   const articlesPerPage = 18;
+
+  const toggleView = (mode: "card" | "list") => {
+    setViewMode(mode);
+    localStorage.setItem("news-view", mode);
+  };
 
   // Fetch market news
   useEffect(() => {
@@ -58,16 +69,53 @@ export default function NewsPage() {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Market News 📰</h1>
-          <p className="mt-2 text-gray-600">
-            Stay updated with the latest market trends and financial news
-          </p>
-          {!isLoadingNews && allNews.length > 0 && (
-            <p className="mt-1 text-sm text-gray-500">
-              Showing {startIndex + 1}-{Math.min(endIndex, allNews.length)} of {allNews.length} articles
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Market News 📰</h1>
+            <p className="mt-2 text-gray-600">
+              Stay updated with the latest market trends and financial news
             </p>
-          )}
+            {!isLoadingNews && allNews.length > 0 && (
+              <p className="mt-1 text-sm text-gray-500">
+                Showing {startIndex + 1}-{Math.min(endIndex, allNews.length)} of {allNews.length} articles
+              </p>
+            )}
+          </div>
+
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-1 shrink-0">
+            <button
+              onClick={() => toggleView("card")}
+              title="Card view"
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                viewMode === "card"
+                  ? "bg-blue-500 text-white shadow-sm"
+                  : "text-gray-500 hover:text-gray-800"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="8" height="8" rx="1.5" />
+                <rect x="13" y="3" width="8" height="8" rx="1.5" />
+                <rect x="3" y="13" width="8" height="8" rx="1.5" />
+                <rect x="13" y="13" width="8" height="8" rx="1.5" />
+              </svg>
+              Cards
+            </button>
+            <button
+              onClick={() => toggleView("list")}
+              title="List view"
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                viewMode === "list"
+                  ? "bg-blue-500 text-white shadow-sm"
+                  : "text-gray-500 hover:text-gray-800"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z" />
+              </svg>
+              List
+            </button>
+          </div>
         </div>
 
         {/* Market News Section */}
@@ -77,16 +125,18 @@ export default function NewsPage() {
           </div>
         ) : currentNews.length > 0 ? (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className={viewMode === "card" ? "grid md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
               {currentNews.map((news, index) => (
                 <a
                   key={index}
                   href={news.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow border border-gray-200"
+                  className={`block bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow border border-gray-200 ${
+                    viewMode === "list" ? "flex flex-col sm:flex-row gap-4" : ""
+                  }`}
                 >
-                  {news.image && (
+                  {viewMode === "card" && news.image && (
                     <img
                       src={news.image}
                       alt={news.headline}
@@ -96,15 +146,17 @@ export default function NewsPage() {
                       }}
                     />
                   )}
-                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2">
-                    {news.headline}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                    {news.summary}
-                  </p>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>{news.source}</span>
-                    <span>{new Date(news.datetime * 1000).toLocaleDateString()}</span>
+                  <div className={viewMode === "list" ? "flex-1" : ""}>
+                    <h3 className={`font-bold text-gray-900 mb-2 ${viewMode === "card" ? "line-clamp-2" : "line-clamp-1 sm:line-clamp-2"}`}>
+                      {news.headline}
+                    </h3>
+                    <p className={`text-sm text-gray-600 mb-3 ${viewMode === "card" ? "line-clamp-3" : "line-clamp-2"}`}>
+                      {news.summary}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>{news.source}</span>
+                      <span>{new Date(news.datetime * 1000).toLocaleDateString()}</span>
+                    </div>
                   </div>
                 </a>
               ))}
