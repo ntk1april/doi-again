@@ -57,7 +57,7 @@ export async function GET() {
       {
         success: true,
         data: {
-          rate: 31.45,
+          rate: 32,
           base: "USD",
           target: "THB",
           timestamp: new Date().toISOString(),

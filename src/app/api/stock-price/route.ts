@@ -51,24 +51,25 @@ export async function GET(request: NextRequest) {
     let marketStatus = "closed";
     let isMarketOpen = false;
 
-    // Pre-market: 4:00 AM - 9:30 AM EST
+    // Pre-market: 3:00 AM - 8:30 AM EST
     if (
-      (estHours === 4 && estMinutes >= 0) ||
-      (estHours > 4 && estHours < 9) ||
-      (estHours === 9 && estMinutes < 30)
+      (estHours === 3 && estMinutes >= 0) ||
+      (estHours > 3 && estHours < 8) ||
+      (estHours === 8 && estMinutes < 30)
     ) {
       marketStatus = "pre-market";
     }
-    // Regular hours: 9:30 AM - 4:00 PM EST
+    // Regular hours: 8:30 AM - 3:00 PM EST
     else if (
-      (estHours === 9 && estMinutes >= 30) ||
-      (estHours > 9 && estHours < 16)
+      (estHours === 8 && estMinutes >= 30) ||
+      (estHours > 8 && estHours < 15) ||
+      (estHours === 15 && estMinutes < 30)
     ) {
       marketStatus = "regular";
       isMarketOpen = true;
     }
-    // After-hours: 4:00 PM - 8:00 PM EST
-    else if (estHours >= 16 && estHours < 20) {
+    // After-hours: 3:00 PM - 7:00 PM EST
+    else if (estHours >= 15 && estHours < 19) {
       marketStatus = "after-hours";
     }
 
