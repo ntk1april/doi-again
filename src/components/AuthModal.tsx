@@ -147,7 +147,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm">
       <div className="relative w-full max-w-md mx-4">
         {/* Close */}
         <button
@@ -155,11 +155,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
           className="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl"
         >✕</button>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
           {/* Header */}
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">{titles[mode].heading}</h2>
-            <p className="text-gray-600 text-sm">{titles[mode].sub}</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{titles[mode].heading}</h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">{titles[mode].sub}</p>
           </div>
 
           {/* Step indicator */}
@@ -171,11 +171,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
                 const si = order.indexOf(s.step);
                 return (
                   <div key={s.step} className="flex items-center gap-2">
-                    <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${si < cur ? "bg-green-500 text-white" : si === cur ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"}`}>
+                    <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${si < cur ? "bg-green-500 text-white" : si === cur ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"}`}>
                       {si < cur ? "✓" : i + 1}
                     </div>
-                    <span className={`text-xs font-medium ${si === cur ? "text-gray-900" : "text-gray-400"}`}>{s.label}</span>
-                    {i < arr.length - 1 && <div className="w-6 h-px bg-gray-300" />}
+                    <span className={`text-xs font-medium ${si === cur ? "text-gray-900 dark:text-gray-100" : "text-gray-400 dark:text-gray-500"}`}>{s.label}</span>
+                    {i < arr.length - 1 && <div className="w-6 h-px bg-gray-300 dark:bg-gray-600" />}
                   </div>
                 );
               })}
@@ -190,12 +190,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
             {/* Full Name */}
             {mode === "signup" && (
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                 <input
                   ref={nameRef}
                   id="name" name="name" type="text" required
                   autoComplete="name"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-black"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 dark:placeholder-gray-500 text-black dark:text-white"
                   placeholder="Nanthakorn Kaenkaew"
                 />
               </div>
@@ -204,12 +204,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
             {/* Email */}
             {(mode === "signin" || mode === "signup" || mode === "forgot") && (
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
                 <input
                   ref={emailRef}
                   id="email" name="email" type="text" required
                   autoComplete="email"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-black"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 dark:placeholder-gray-500 text-black dark:text-white"
                   placeholder="nanthakorn@example.com"
                 />
               </div>
@@ -218,26 +218,26 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
             {/* OTP */}
             {mode === "otp" && (
               <div>
-                <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-1">6-Digit OTP</label>
+                <label htmlFor="otp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">6-Digit OTP</label>
                 <input
                   ref={otpRef}
                   id="otp" name="otp" type="text" required
                   inputMode="numeric" maxLength={6} minLength={6}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-center text-2xl font-bold tracking-widest focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-300 text-black"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-3 text-center text-2xl font-bold tracking-widest focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-300 dark:placeholder-gray-500 text-black dark:text-white"
                   placeholder="••••••"
                   onInput={(e) => {
                     const input = e.currentTarget;
                     input.value = input.value.replace(/\D/g, "").slice(0, 6);
                   }}
                 />
-                <p className="mt-1 text-xs text-gray-500">Check your email inbox (and spam folder)</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Check your email inbox (and spam folder)</p>
               </div>
             )}
 
             {/* Password */}
             {(mode === "signin" || mode === "signup" || mode === "reset") && (
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {mode === "reset" ? "New Password" : "Password"}
                 </label>
                 <input
@@ -246,11 +246,11 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
                   autoComplete={mode === "signin" ? "current-password" : "new-password"}
                   minLength={mode === "signin" ? 1 : 6}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 text-black"
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 placeholder-gray-400 dark:placeholder-gray-500 text-black dark:text-white"
                   placeholder="••••••••"
                 />
                 {mode !== "signin" && (
-                  <p className="mt-1 text-xs text-gray-500">Must be at least 6 characters</p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Must be at least 6 characters</p>
                 )}
               </div>
             )}
@@ -258,7 +258,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
             {/* Confirm Password */}
             {(mode === "signup" || mode === "reset") && (
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Confirm {mode === "reset" ? "New " : ""}Password
                 </label>
                 <input
@@ -267,12 +267,12 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
                   autoComplete="new-password"
                   minLength={6}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 placeholder-gray-400 text-black ${
+                  className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 placeholder-gray-400 dark:placeholder-gray-500 text-black dark:text-white ${
                     passwordsMismatch
                       ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
                       : passwordsMatch
                       ? "border-green-400 focus:border-green-500 focus:ring-green-500/20"
-                      : "border-gray-300 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500/20"
                   }`}
                   placeholder="••••••••"
                 />
@@ -294,24 +294,24 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
           <div className="mt-6 text-center space-y-2">
             {mode === "signin" && (
               <>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Don&apos;t have an account?{" "}
                   <button onClick={() => switchMode("signup")} className="font-semibold text-blue-500 hover:text-blue-700">Sign Up</button>
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   Forgot your password?{" "}
                   <button onClick={() => switchMode("forgot")} className="font-semibold text-orange-500 hover:text-orange-700">Reset Password</button>
                 </p>
               </>
             )}
             {mode === "signup" && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Already have an account?{" "}
                 <button onClick={() => switchMode("signin")} className="font-semibold text-blue-500 hover:text-blue-700">Sign In</button>
               </p>
             )}
             {(mode === "forgot" || mode === "otp" || mode === "reset") && !successMsg && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 <button onClick={() => switchMode("signin")} className="font-semibold text-blue-500 hover:text-blue-700">← Back to Sign In</button>
               </p>
             )}
@@ -321,7 +321,7 @@ export default function AuthModal({ isOpen, onClose, initialMode = "signin" }: A
               </button>
             )}
             {mode === "otp" && (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Didn&apos;t receive it?{" "}
                 <button
                   type="button"

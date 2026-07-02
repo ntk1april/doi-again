@@ -50,3 +50,63 @@ export async function DELETE(
     );
   }
 }
+
+/**
+ * PUT /api/wishlist/[symbol]
+ * Update wishlist item notes or target price
+ */
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ symbol: string }> }
+): Promise<NextResponse> {
+  try {
+    const userId = requireAuth(request);
+    await connectDB();
+
+    const { symbol } = await params;
+    const normalizedSymbol = symbol.toUpperCase();
+
+    const body = await request.json();
+    const { notes, targetPrice } = body;
+
+    const wishlistItem = await Wishlist.findOne({ userId, symbol: normalizedSymbol });
+
+    if (!wishlistItem) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Stock not found in wishlist",
+        } as ApiResponse,
+        { status: 404 }
+      );
+    }
+
+    if (notes !== undefined) {
+      wishlistItem.set('notes', notes);
+    }
+    
+    if (targetPrice !== undefined) {
+      wishlistItem.set('targetPrice', targetPrice === "" || targetPrice === null ? undefined : Number(targetPrice));
+    }
+
+    await wishlistItem.save();
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: wishlistItem,
+        message: `${normalizedSymbol} wishlist updated`,
+      } as ApiResponse,
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating wishlist:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to update wishlist",
+      } as ApiResponse,
+      { status: 500 }
+    );
+  }
+}

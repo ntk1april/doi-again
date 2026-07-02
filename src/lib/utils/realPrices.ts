@@ -6,7 +6,7 @@
 
 // Cache prices for 60 seconds (matches /api/stock-price revalidation)
 const priceCache: Record<string, { price: number; timestamp: number }> = {};
-const CACHE_DURATION = 60 * 1000; // 60 seconds
+const CACHE_DURATION = 12 * 1000; // 12 seconds
 
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 const ALPHAVANTAGE_API_KEY = process.env.ALPHAVANTAGE_API_KEY;
@@ -23,7 +23,7 @@ async function getPriceFromFinnhub(symbol: string): Promise<number | null> {
   try {
     const response = await fetch(
       `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`,
-      { next: { revalidate: 30 } }, // Match stock-price API cache
+      { next: { revalidate: 12 } }, // Match stock-price API cache
     );
 
     if (!response.ok) {
@@ -58,7 +58,7 @@ async function getPriceFromAlphaVantage(
   try {
     const response = await fetch(
       `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHAVANTAGE_API_KEY}`,
-      { next: { revalidate: 60 } },
+      { next: { revalidate: 12 } },
     );
 
     if (!response.ok) {
@@ -106,8 +106,17 @@ export async function getRealStockPrice(symbol: string): Promise<number> {
     price = await getPriceFromAlphaVantage(upperSymbol);
   }
 
-  // If both APIs fail, throw error to use fallback (avgPrice)
+  // If both APIs fail, try to use expired cache, otherwise throw error
   if (!price) {
+    if (cached) {
+      console.warn(
+        `APIs failed for ${upperSymbol}, using expired cached price`,
+      );
+      // Update timestamp to avoid spamming APIs on every request while rate-limited
+      priceCache[upperSymbol].timestamp = Date.now();
+      return cached.price;
+    }
+
     throw new Error(
       `Unable to fetch price for ${upperSymbol}. APIs not configured or unavailable.`,
     );

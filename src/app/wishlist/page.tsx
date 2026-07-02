@@ -42,6 +42,12 @@ export default function WishlistPage() {
     }
     return "table";
   });
+
+  const [editingItem, setEditingItem] = useState<WishlistItem | null>(null);
+  const [editNotes, setEditNotes] = useState("");
+  const [editTargetPrice, setEditTargetPrice] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -207,14 +213,47 @@ export default function WishlistPage() {
     }
   };
 
+  const handleEditDetails = (item: WishlistItem) => {
+    setEditingItem(item);
+    setEditNotes(item.notes || "");
+    setEditTargetPrice(item.targetPrice ? item.targetPrice.toString() : "");
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingItem) return;
+    setIsSaving(true);
+    try {
+      const response = await authFetch(`/api/wishlist/${editingItem.symbol}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          notes: editNotes,
+          targetPrice: editTargetPrice ? Number(editTargetPrice) : null,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchWishlist();
+        setEditingItem(null);
+      } else {
+        setError(data.error || "Failed to update");
+      }
+    } catch (err) {
+      setError("Failed to update wishlist");
+    } finally {
+      setIsSaving(false);
+    }
+  };
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Wishlist ⭐</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              Wishlist ⭐
+            </h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               Stocks you're interested in. Use the search bar above to add more
               stocks.
             </p>
@@ -230,24 +269,26 @@ export default function WishlistPage() {
           {/* Loading State */}
           {isLoading && (
             <div className="text-center py-12">
-              <p className="text-gray-600">Loading wishlist...</p>
+              <p className="text-gray-600 dark:text-gray-400">
+                Loading wishlist...
+              </p>
             </div>
           )}
 
           {/* Empty State */}
           {!isLoading && wishlist.length === 0 && (
-            <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center">
               <div className="mb-4">
                 <span className="text-6xl">⭐</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Your wishlist is empty
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Use the search bar above to find and add stocks you're
                 interested in
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 💡 Tip: Search for a stock, then click "Add to Wishlist" from
                 the actions menu
               </p>
@@ -259,7 +300,7 @@ export default function WishlistPage() {
             <>
               {/* Sort + View Toggle Controls */}
               <div className="mb-4 flex flex-wrap items-center gap-2">
-                <span className="text-sm font-medium text-gray-600 mr-1">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mr-1">
                   Sort by:
                 </span>
                 {(
@@ -276,7 +317,7 @@ export default function WishlistPage() {
                     className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium border transition-all ${
                       sortField === key
                         ? "bg-blue-500 text-white border-blue-500 shadow-sm"
-                        : "bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:text-blue-600"
+                        : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-600"
                     }`}
                   >
                     {label}
@@ -289,14 +330,14 @@ export default function WishlistPage() {
                 ))}
 
                 {/* View Toggle */}
-                <div className="ml-auto flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-1">
+                <div className="ml-auto flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
                   <button
                     onClick={() => toggleView("card")}
                     title="Card view"
                     className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
                       viewMode === "card"
                         ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 hover:text-gray-800"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                     }`}
                   >
                     <svg
@@ -318,7 +359,7 @@ export default function WishlistPage() {
                     className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
                       viewMode === "table"
                         ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 hover:text-gray-800"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                     }`}
                   >
                     <svg
@@ -342,7 +383,7 @@ export default function WishlistPage() {
                     return (
                       <div
                         key={item._id}
-                        className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+                        className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow"
                       >
                         {priceData && (
                           <div className="flex justify-end mb-2">
@@ -351,21 +392,25 @@ export default function WishlistPage() {
                         )}
                         <div className="flex items-center gap-3 mb-4">
                           <StockLogo symbol={item.symbol} size="lg" />
-                          <h3 className="text-xl font-bold text-gray-900">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                             {item.symbol}
                           </h3>
                         </div>
                         {priceData ? (
                           <div className="mb-4">
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                               Current Price
                             </p>
                             <div className="flex items-baseline gap-2">
-                              <p className="text-2xl font-bold text-gray-900">
+                              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 ${priceData.price.toFixed(2)}
                               </p>
                               <p
-                                className={`text-sm font-semibold ${priceData.change >= 0 ? "text-green-600" : "text-red-600"}`}
+                                className={`text-sm font-semibold ${
+                                  priceData.change >= 0
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
                               >
                                 {priceData.change >= 0 ? "+" : ""}
                                 {priceData.change.toFixed(2)} (
@@ -380,10 +425,31 @@ export default function WishlistPage() {
                             </p>
                           </div>
                         )}
-                        <div className="mb-4 text-xs text-gray-500">
+                        <div className="mb-4 text-xs text-gray-500 dark:text-gray-400">
                           Added {new Date(item.addedAt).toLocaleDateString()}
                         </div>
+                        {(item.notes || item.targetPrice) && (
+                          <div className="mb-4 rounded bg-blue-50 dark:bg-gray-700 p-3 text-sm border border-blue-100 dark:border-gray-600">
+                            {item.targetPrice && (
+                              <div className="font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                                🎯 Target: ${item.targetPrice.toFixed(2)}
+                              </div>
+                            )}
+                            {item.notes && (
+                              <div className="text-gray-700 dark:text-gray-300 italic">
+                                "{item.notes}"
+                              </div>
+                            )}
+                          </div>
+                        )}
                         <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditDetails(item)}
+                            className="rounded-md border border-gray-300 px-3 py-2 font-medium text-gray-700 hover:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex-none"
+                            title="Edit notes & target"
+                          >
+                            ✏️
+                          </button>
                           <Link
                             href={`/stocks/${item.symbol}`}
                             className="flex-1 rounded-md bg-blue-500 px-4 py-2 text-center font-medium text-white hover:bg-blue-700"
@@ -392,9 +458,10 @@ export default function WishlistPage() {
                           </Link>
                           <button
                             onClick={() => handleRemove(item.symbol)}
-                            className="rounded-md border border-red-500 px-4 py-2 font-medium text-red-500 hover:bg-red-50"
+                            className="rounded-md border border-red-500 px-4 py-2 font-medium text-black-500 hover:bg-red-500 flex-none"
+                            title="Remove from wishlist"
                           >
-                            🗑️ Remove
+                            🗑️
                           </button>
                         </div>
                       </div>
@@ -405,29 +472,32 @@ export default function WishlistPage() {
 
               {/* ── Table View ── */}
               {viewMode === "table" && (
-                <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+                <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
                   <table className="w-full text-sm">
-                    <thead className="border-b border-gray-200 bg-gray-50">
+                    <thead className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                       <tr>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-900">
+                        <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">
                           Stock
                         </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900">
+                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
                           Price
                         </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900">
+                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
                           Change
                         </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900">
+                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
+                          Target
+                        </th>
+                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
                           Change %
                         </th>
-                        <th className="px-4 py-3 text-center font-semibold text-gray-900">
+                        <th className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-gray-100">
                           Status
                         </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900">
+                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
                           Added
                         </th>
-                        <th className="px-4 py-3 text-center font-semibold text-gray-900">
+                        <th className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-gray-100">
                           Actions
                         </th>
                       </tr>
@@ -439,20 +509,20 @@ export default function WishlistPage() {
                         return (
                           <tr
                             key={item._id}
-                            className="border-b border-gray-100 hover:bg-blue-50 transition-colors"
+                            className="border-b border-gray-100 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
                           >
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
                                 <StockLogo symbol={item.symbol} size="md" />
                                 <Link
                                   href={`/stocks/${item.symbol}`}
-                                  className="font-semibold text-gray-900 hover:text-blue-600"
+                                  className="font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600"
                                 >
                                   {item.symbol}
                                 </Link>
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-right font-medium text-gray-900">
+                            <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-gray-100">
                               {priceData ? (
                                 `$${priceData.price.toFixed(2)}`
                               ) : (
@@ -462,17 +532,30 @@ export default function WishlistPage() {
                               )}
                             </td>
                             <td
-                              className={`px-4 py-3 text-right font-medium ${isUp ? "text-green-600" : "text-red-600"}`}
+                              className={`px-4 py-3 text-right font-medium ${
+                                isUp ? "text-green-600" : "text-red-600"
+                              }`}
                             >
                               {priceData
-                                ? `${isUp ? "+" : ""}${priceData.change.toFixed(2)}`
+                                ? `${isUp ? "+" : ""}${priceData.change.toFixed(
+                                    2,
+                                  )}`
+                                : "—"}
+                            </td>
+                            <td className="px-4 py-3 text-right font-medium text-blue-600 dark:text-blue-400">
+                              {item.targetPrice
+                                ? `$${item.targetPrice.toFixed(2)}`
                                 : "—"}
                             </td>
                             <td
-                              className={`px-4 py-3 text-right font-medium ${isUp ? "text-green-600" : "text-red-600"}`}
+                              className={`px-4 py-3 text-right font-medium ${
+                                isUp ? "text-green-600" : "text-red-600"
+                              }`}
                             >
                               {priceData
-                                ? `${isUp ? "+" : ""}${priceData.changePercent.toFixed(2)}%`
+                                ? `${
+                                    isUp ? "+" : ""
+                                  }${priceData.changePercent.toFixed(2)}%`
                                 : "—"}
                             </td>
                             <td className="px-4 py-3 text-center">
@@ -480,11 +563,17 @@ export default function WishlistPage() {
                                 ? getMarketStatusBadge(priceData.marketStatus)
                                 : "—"}
                             </td>
-                            <td className="px-4 py-3 text-right text-xs text-gray-500">
+                            <td className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">
                               {new Date(item.addedAt).toLocaleDateString()}
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center justify-center gap-2">
+                                <button
+                                  onClick={() => handleEditDetails(item)}
+                                  className="rounded border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-700 hover:text-white dark:border-gray-400 dark:text-gray-400 dark:hover:bg-white dark:hover:text-black"
+                                >
+                                  Edit
+                                </button>
                                 <Link
                                   href={`/stocks/${item.symbol}`}
                                   className="rounded bg-blue-500 px-2.5 py-1 text-xs font-medium text-white hover:bg-blue-700"
@@ -493,7 +582,7 @@ export default function WishlistPage() {
                                 </Link>
                                 <button
                                   onClick={() => handleRemove(item.symbol)}
-                                  className="rounded border border-red-400 px-2.5 py-1 text-xs font-medium text-red-500 hover:bg-red-50"
+                                  className="rounded border border-red-400 px-2.5 py-1 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white dark:border-red-600 dark:text-red-400 dark:hover:bg-red-600"
                                 >
                                   Remove
                                 </button>
@@ -510,6 +599,61 @@ export default function WishlistPage() {
           )}
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6 shadow-xl">
+            <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+              Edit {editingItem.symbol} Details
+            </h3>
+
+            <div className="mb-4">
+              <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Notes:
+              </label>
+              <textarea
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                rows={3}
+                placeholder="Add some notes..."
+                value={editNotes}
+                onChange={(e) => setEditNotes(e.target.value)}
+              />
+            </div>
+
+            <div className="mb-6">
+              <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Target Price ($):
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="e.g. 150.00"
+                value={editTargetPrice}
+                onChange={(e) => setEditTargetPrice(e.target.value)}
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setEditingItem(null)}
+                disabled={isSaving}
+                className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={isSaving}
+                className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
+              >
+                {isSaving ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ProtectedRoute>
   );
 }

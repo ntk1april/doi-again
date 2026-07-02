@@ -76,7 +76,7 @@ export default function StockLogo({ symbol, size = "md", className = "", profile
     <img
       src={logoUrl}
       alt={symbol}
-      className={`${sizeClasses[size]} ${className} rounded-full object-cover bg-gray-100`}
+      className={`${sizeClasses[size]} ${className} rounded-full object-cover bg-gray-100 dark:bg-gray-800`}
       onError={handleError}
     />
   );

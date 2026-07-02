@@ -223,15 +223,15 @@ export default function StockDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading stock details...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <p className="text-gray-600 dark:text-gray-400">Loading stock details...</p>
       </div>
     );
   }
 
   if (error || !stockDetails) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
         <div className="mx-auto max-w-7xl">
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
             {error || "Stock not found"}
@@ -251,16 +251,16 @@ export default function StockDetailPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <StockLogo symbol={symbol} size="lg" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">{symbol}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{symbol}</h1>
                 {profile?.name && (
-                  <p className="mt-1 text-gray-600">{profile.name}</p>
+                  <p className="mt-1 text-gray-600 dark:text-gray-400">{profile.name}</p>
                 )}
               </div>
             </div>
@@ -317,11 +317,11 @@ export default function StockDetailPage() {
 
           {/* Current Price Card */}
           {quote && (
-            <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="mb-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Current Price</p>
-                  <p className="text-4xl font-bold text-gray-900">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Current Price</p>
+                  <p className="text-4xl font-bold text-gray-900 dark:text-gray-100">
                     ${quote.c?.toFixed(2) || "N/A"}
                   </p>
                 </div>
@@ -329,7 +329,7 @@ export default function StockDetailPage() {
                   <p className={`text-2xl font-semibold ${quote.d >= 0 ? "text-green-600" : "text-red-600"}`}>
                     {quote.d >= 0 ? "+" : ""}{quote.d?.toFixed(2)} ({quote.dp?.toFixed(2)}%)
                   </p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                     Open: ${quote.o?.toFixed(2)} | High: ${quote.h?.toFixed(2)} | Low: ${quote.l?.toFixed(2)}
                   </p>
                 </div>
@@ -340,37 +340,37 @@ export default function StockDetailPage() {
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Company Info Card */}
             {profile && (
-              <div className="lg:col-span-1 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Company Info</h2>
+              <div className="lg:col-span-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Company Info</h2>
                 <div className="space-y-3 text-sm">
                   {profile.country && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Country:</span>
-                      <span className="font-medium text-gray-900">{profile.country}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Country:</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.country}</span>
                     </div>
                   )}
                   {profile.exchange && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Exchange:</span>
-                      <span className="font-medium text-gray-900">{profile.exchange}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Exchange:</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.exchange}</span>
                     </div>
                   )}
                   {profile.finnhubIndustry && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Industry:</span>
-                      <span className="font-medium text-gray-900">{profile.finnhubIndustry}</span>
+                      <span className="text-gray-600 dark:text-gray-400">Industry:</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.finnhubIndustry}</span>
                     </div>
                   )}
                   {profile.ipo && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">IPO Date:</span>
-                      <span className="font-medium text-gray-900">{profile.ipo}</span>
+                      <span className="text-gray-600 dark:text-gray-400">IPO Date:</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.ipo}</span>
                     </div>
                   )}
                   {profile.marketCapitalization && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Market Cap:</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="text-gray-600 dark:text-gray-400">Market Cap:</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
                         ${(profile.marketCapitalization / 1000).toFixed(2)}B
                       </span>
                     </div>
@@ -395,77 +395,77 @@ export default function StockDetailPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Financial Metrics */}
               {metrics?.metric && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Metrics</h2>
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Financial Metrics</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {metrics.metric.peBasicExclExtraTTM && (
                       <div>
-                        <p className="text-sm text-gray-600">P/E Ratio</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">P/E Ratio</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.peBasicExclExtraTTM.toFixed(2)}
                         </p>
                       </div>
                     )}
                     {metrics.metric.pbAnnual && (
                       <div>
-                        <p className="text-sm text-gray-600">P/B Ratio</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">P/B Ratio</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.pbAnnual.toFixed(2)}
                         </p>
                       </div>
                     )}
                     {metrics.metric.epsBasicExclExtraItemsAnnual && (
                       <div>
-                        <p className="text-sm text-gray-600">EPS</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">EPS</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           ${metrics.metric.epsBasicExclExtraItemsAnnual.toFixed(2)}
                         </p>
                       </div>
                     )}
                     {metrics.metric.dividendYieldIndicatedAnnual && (
                       <div>
-                        <p className="text-sm text-gray-600">Dividend Yield</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Dividend Yield</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.dividendYieldIndicatedAnnual.toFixed(2)}%
                         </p>
                       </div>
                     )}
                     {metrics.metric.beta && (
                       <div>
-                        <p className="text-sm text-gray-600">Beta</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Beta</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.beta.toFixed(2)}
                         </p>
                       </div>
                     )}
                     {metrics.metric["52WeekHigh"] && (
                       <div>
-                        <p className="text-sm text-gray-600">52W High</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">52W High</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           ${metrics.metric["52WeekHigh"].toFixed(2)}
                         </p>
                       </div>
                     )}
                     {metrics.metric["52WeekLow"] && (
                       <div>
-                        <p className="text-sm text-gray-600">52W Low</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">52W Low</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           ${metrics.metric["52WeekLow"].toFixed(2)}
                         </p>
                       </div>
                     )}
                     {metrics.metric.roeRfy && (
                       <div>
-                        <p className="text-sm text-gray-600">ROE</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">ROE</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.roeRfy.toFixed(2)}%
                         </p>
                       </div>
                     )}
                     {metrics.metric.roaRfy && (
                       <div>
-                        <p className="text-sm text-gray-600">ROA</p>
-                        <p className="text-lg font-semibold text-gray-900">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">ROA</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.roaRfy.toFixed(2)}%
                         </p>
                       </div>
@@ -476,9 +476,9 @@ export default function StockDetailPage() {
 
               {/* Analyst Recommendations */}
               {latestRecommendation && (
-                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-gray-900">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       Analyst Recommendations
                     </h2>
                     {/* Overall Recommendation Summary */}
@@ -502,7 +502,7 @@ export default function StockDetailPage() {
 
                       return (
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600">Consensus:</span>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Consensus:</span>
                           <span className={`px-4 py-2 rounded-lg font-semibold text-sm ${topRecommendation.color}`}>
                             {topRecommendation.label}
                           </span>
@@ -523,7 +523,7 @@ export default function StockDetailPage() {
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
                               <span className="text-sm font-medium text-green-700">Strong Buy</span>
-                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.strongBuy}</span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.strongBuy}</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -548,7 +548,7 @@ export default function StockDetailPage() {
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
                               <span className="text-sm font-medium text-green-600">Buy</span>
-                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.buy}</span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.buy}</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -572,8 +572,8 @@ export default function StockDetailPage() {
                         <div className="flex items-center gap-4">
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm font-medium text-gray-600">Hold</span>
-                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.hold}</span>
+                              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Hold</span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.hold}</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -598,7 +598,7 @@ export default function StockDetailPage() {
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
                               <span className="text-sm font-medium text-red-600">Sell</span>
-                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.sell}</span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.sell}</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -623,7 +623,7 @@ export default function StockDetailPage() {
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
                               <span className="text-sm font-medium text-red-700">Strong Sell</span>
-                              <span className="text-sm font-semibold text-gray-900">{latestRecommendation.strongSell}</span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.strongSell}</span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -636,7 +636,7 @@ export default function StockDetailPage() {
                       );
                     })()}
 
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                       Period: {latestRecommendation.period}
                     </p>
                   </div>
@@ -647,56 +647,56 @@ export default function StockDetailPage() {
 
           {/* Stock News Section */}
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Latest News for {symbol}
             </h2>
 
             {newsLoading ? (
               <div className="text-center py-12">
-                <p className="text-gray-600">Loading news...</p>
+                <p className="text-gray-600 dark:text-gray-400">Loading news...</p>
               </div>
             ) : news.length > 0 ? (
-              <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                         Headline
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                         Source
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                         Date
                       </th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {/* Action */}
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {news.map((article, index) => (
-                      <tr key={article.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         {/* Headline */}
                         <td className="px-6 py-4">
                           <div>
-                            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
                               {article.headline}
                             </h3>
-                            <p className="text-sm text-gray-600 line-clamp-2">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                               {article.summary}
                             </p>
                           </div>
                         </td>
 
                         {/* Source */}
-                        <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+                        <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                           {article.source}
                         </td>
 
                         {/* Date */}
-                        <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                           {new Date(article.datetime * 1000).toLocaleDateString()}
                         </td>
 
@@ -718,8 +718,8 @@ export default function StockDetailPage() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <p className="text-gray-600">No recent news available for {symbol}</p>
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                <p className="text-gray-600 dark:text-gray-400">No recent news available for {symbol}</p>
               </div>
             )}
           </div>

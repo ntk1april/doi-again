@@ -86,10 +86,10 @@ function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHo
   if (total === 0) {
     return (
       <div className="flex flex-col items-center">
-        <div className="w-44 h-44 flex items-center justify-center rounded-full border-4 border-gray-100 text-sm text-gray-400">
+        <div className="w-44 h-44 flex items-center justify-center rounded-full border-4 border-gray-100 dark:border-gray-700 text-sm text-gray-400 dark:text-gray-500">
           No data
         </div>
-        <p className="mt-3 text-sm font-semibold text-gray-700">{label}</p>
+        <p className="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</p>
       </div>
     );
   }
@@ -120,29 +120,29 @@ function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHo
                 opacity={isActive ? 1 : 0.25}
                 stroke="white"
                 strokeWidth="2"
-                className="cursor-pointer transition-opacity duration-200"
+                className="cursor-pointer transition-opacity duration-200 stroke-white dark:stroke-gray-800"
                 onMouseEnter={() => onHover(seg.label)}
                 onMouseLeave={() => onHover(null)}
               />
             );
           })}
           {/* Center label */}
-          <text x={cx} y={cy - 8} textAnchor="middle" className="text-sm" fill="#374151" fontSize="13" fontWeight="600">
+          <text x={cx} y={cy - 8} textAnchor="middle" className="text-sm fill-gray-700 dark:fill-gray-300" fontSize="13" fontWeight="600">
             {hovered ? hovered.label : "Total"}
           </text>
-          <text x={cx} y={cy + 10} textAnchor="middle" fill="#6B7280" fontSize="11">
+          <text x={cx} y={cy + 10} textAnchor="middle" className="fill-gray-500 dark:fill-gray-400" fontSize="11">
             {hovered
               ? hideNumbers ? "••••••" : formatValue(hovered.value)
               : hideNumbers ? "••••••" : formatValue(total)}
           </text>
           {hovered && (
-            <text x={cx} y={cy + 25} textAnchor="middle" fill="#9CA3AF" fontSize="10">
+            <text x={cx} y={cy + 25} textAnchor="middle" className="fill-gray-400 dark:fill-gray-500" fontSize="10">
               {hovered.percent.toFixed(1)}%
             </text>
           )}
         </svg>
       </div>
-      <p className="mt-1 text-sm font-semibold text-gray-700">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</p>
     </div>
   );
 }
@@ -168,8 +168,8 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
   const totalCost = stocks.reduce((s, d) => s + d.totalCost, 0);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900 mb-6">Portfolio Allocation</h2>
+    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Portfolio Allocation</h2>
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Charts — side by side on sm+, stacked on xs */}
@@ -204,7 +204,7 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
                 <div
                   key={stock.symbol}
                   className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-150 ${isActive ? "opacity-100" : "opacity-40"
-                    } hover:bg-gray-50`}
+                    } hover:bg-gray-50 dark:hover:bg-gray-700`}
                   onMouseEnter={() => setHoveredSymbol(stock.symbol)}
                   onMouseLeave={() => setHoveredSymbol(null)}
                 >
@@ -215,8 +215,8 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
                   />
                   {/* Info */}
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{stock.symbol}</p>
-                    <div className="flex gap-3 text-xs text-gray-500">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{stock.symbol}</p>
+                    <div className="flex gap-3 text-xs text-gray-500 dark:text-gray-400">
                       <span>Units: {hideNumbers ? "••" : `${unitPct.toFixed(1)}%`}</span>
                       <span>Cost: {hideNumbers ? "••" : `${costPct.toFixed(1)}%`}</span>
                     </div>

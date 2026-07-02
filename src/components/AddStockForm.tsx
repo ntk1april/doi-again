@@ -151,7 +151,7 @@ export default function StockForm({
       <div>
         <label
           htmlFor="symbol"
-          className="block text-sm font-bold text-gray-700"
+          className="block text-sm font-bold text-gray-700 dark:text-gray-300"
         >
           Stock Symbol
         </label>
@@ -168,7 +168,7 @@ export default function StockForm({
             }
             readOnly={readOnlySymbol}
             placeholder="e.g., GOOGL"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 shadow-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none"
             disabled={isLoading || readOnlySymbol}
             autoComplete="off"
           />
@@ -187,19 +187,19 @@ export default function StockForm({
           {showSuggestions && suggestions.length > 0 && (
             <div
               ref={suggestionsRef}
-              className="absolute top-full left-0 right-0 z-10 mt-1 rounded-md border border-gray-300 bg-white shadow-lg max-h-56 overflow-y-auto"
+              className="absolute top-full left-0 right-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-lg max-h-56 overflow-y-auto"
             >
               {suggestions.map((item) => (
                 <button
                   key={item.symbol}
                   type="button"
                   onClick={() => selectSuggestion(item.symbol)}
-                  className="w-full text-left px-3 py-3 hover:bg-blue-50 border-b border-gray-200 last:border-b-0 flex items-center gap-3"
+                  className="w-full text-left px-3 py-3 hover:bg-blue-50 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 last:border-b-0 flex items-center gap-3"
                 >
                   <StockLogo symbol={item.symbol} size="md" />
                   <div className="flex-1 min-w-0" title={item.name}>
-                    <div className="font-medium text-black">{item.symbol}</div>
-                    <div className="text-sm text-gray-500 truncate">
+                    <div className="font-medium text-black dark:text-white">{item.symbol}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {item.name}
                     </div>
                   </div>
@@ -217,7 +217,7 @@ export default function StockForm({
             symbol.length > 0 &&
             suggestions.length === 0 &&
             !searchLoading && (
-              <div className="absolute top-full left-0 right-0 z-10 mt-1 rounded-md border border-gray-300 bg-white shadow-lg p-3 text-gray-500">
+              <div className="absolute top-full left-0 right-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-lg p-3 text-gray-500 dark:text-gray-400">
                 No stocks found. Try another search.
               </div>
             )}
@@ -228,7 +228,7 @@ export default function StockForm({
       <div>
         <label
           htmlFor="units"
-          className="block text-sm font-bold text-gray-700"
+          className="block text-sm font-bold text-gray-700 dark:text-gray-300"
         >
           Units
         </label>
@@ -240,7 +240,7 @@ export default function StockForm({
           placeholder="e.g., 10"
           step="0.0000001"
           min="0"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 shadow-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none"
           disabled={isLoading}
         />
       </div>
@@ -249,7 +249,7 @@ export default function StockForm({
       <div>
         <label
           htmlFor="price"
-          className="block text-sm font-bold text-gray-700"
+          className="block text-sm font-bold text-gray-700 dark:text-gray-300"
         >
           Price (USD)
         </label>
@@ -261,7 +261,7 @@ export default function StockForm({
           placeholder="e.g., 150.50"
           step="0.0001"
           min="0"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm text-black placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 shadow-sm text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none"
           disabled={isLoading}
         />
       </div>

@@ -98,7 +98,7 @@ export default function PortfolioDashboard() {
     return "table";
   });
 
-  const { user, signOut, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   const [tabs, setTabs] = useState<PortfolioTab[]>([
@@ -263,8 +263,8 @@ export default function PortfolioDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
       </div>
     );
   }
@@ -274,15 +274,15 @@ export default function PortfolioDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
               Portfolio 📊
             </h1>
-            <p className="mt-1 text-gray-600 text-sm sm:text-base">
+            <p className="mt-1 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               Welcome, {user.name}! 👋
             </p>
           </div>
@@ -291,7 +291,7 @@ export default function PortfolioDashboard() {
             <button
               onClick={() => setHideNumbers(!hideNumbers)}
               title={hideNumbers ? "Show numbers" : "Hide numbers"}
-              className="flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               {hideNumbers ? (
                 <>
@@ -339,26 +339,26 @@ export default function PortfolioDashboard() {
             </button>
 
             {/* Currency Toggle */}
-            <div className="flex items-center bg-white rounded-lg border border-gray-300 p-1">
+            <div className="flex items-center bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-1">
               <button
                 onClick={() => setCurrency("USD")}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   currency === "USD"
                     ? "bg-blue-500 text-white"
-                    : "text-gray-600 hover:text-gray-900"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                 }`}
               >
-                USD
+                $
               </button>
               <button
                 onClick={() => setCurrency("THB")}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   currency === "THB"
                     ? "bg-blue-500 text-white"
-                    : "text-gray-600 hover:text-gray-900"
+                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                 }`}
               >
-                THB
+                ฿
               </button>
             </div>
             <Link
@@ -371,11 +371,11 @@ export default function PortfolioDashboard() {
         </div>
 
         {/* Motivational Quote */}
-        <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 sm:p-6 border border-blue-200">
-          <div className="text-sm sm:text-lg text-gray-800 italic mb-2 line-clamp-3 sm:line-clamp-none">
+        <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 rounded-2xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800">
+          <div className="text-sm sm:text-lg text-gray-800 dark:text-gray-200 italic mb-2 line-clamp-3 sm:line-clamp-none">
             "{currentQuote.text}"
           </div>
-          <div className="text-gray-600 font-semibold text-xs sm:text-sm">
+          <div className="text-gray-600 dark:text-gray-400 font-semibold text-xs sm:text-sm">
             — {currentQuote.author}
           </div>
         </div>
@@ -390,7 +390,9 @@ export default function PortfolioDashboard() {
         {/* Loading State */}
         {isLoading && (
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading portfolio...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading portfolio...
+            </p>
           </div>
         )}
 
@@ -431,11 +433,11 @@ export default function PortfolioDashboard() {
             <div className="mt-8">
               {/* Toggle bar */}
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   {filteredStocks.length} stock
                   {filteredStocks.length !== 1 ? "s" : ""}
                 </p>
-                <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-1">
+                <div className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
                   <button
                     onClick={() => {
                       setPortfolioView("card");
@@ -445,7 +447,7 @@ export default function PortfolioDashboard() {
                     className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
                       portfolioView === "card"
                         ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 hover:text-gray-800"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                     }`}
                   >
                     <svg
@@ -470,7 +472,7 @@ export default function PortfolioDashboard() {
                     className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
                       portfolioView === "table"
                         ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 hover:text-gray-800"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                     }`}
                   >
                     <svg

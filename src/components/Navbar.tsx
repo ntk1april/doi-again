@@ -9,6 +9,7 @@ import AuthModal from "./AuthModal";
 import { authFetch } from "@/lib/utils/auth-fetch";
 import Swal from "sweetalert2";
 import { Menu, X } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface StockSuggestion {
   symbol: string;
@@ -24,7 +25,9 @@ export default function Navbar() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
+  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">(
+    "signin",
+  );
   const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const searchRef = useRef<HTMLDivElement>(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -57,7 +60,9 @@ export default function Navbar() {
 
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const response = await fetch(`/api/search-stocks?q=${encodeURIComponent(searchQuery)}`);
+        const response = await fetch(
+          `/api/search-stocks?q=${encodeURIComponent(searchQuery)}`,
+        );
         const data = await response.json();
 
         if (data.results && Array.isArray(data.results)) {
@@ -166,9 +171,14 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo & Brand */}
           <div className="flex items-center gap-8">
-            <Link href={user ? "/portfolio" : "/"} className="flex items-center gap-2">
+            <Link
+              href={user ? "/portfolio" : "/"}
+              className="flex items-center gap-2"
+            >
               <div className="text-2xl font-bold text-white">📉</div>
-              <span className="text-xl font-bold text-white hidden sm:block">Doi Again</span>
+              <span className="text-xl font-bold text-white hidden sm:block">
+                Doi Again
+              </span>
             </Link>
 
             {/* Navigation Links - Only for authenticated users */}
@@ -176,37 +186,41 @@ export default function Navbar() {
               <div className="hidden md:flex items-center gap-4">
                 <Link
                   href="/portfolio"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/portfolio"
-                    ? "bg-white/20 text-white"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                    }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/portfolio"
+                      ? "bg-white/20 text-white"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
                 >
                   Portfolio 💼
                 </Link>
                 <Link
                   href="/wishlist"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname?.startsWith("/wishlist")
-                    ? "bg-white/20 text-white"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                    }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname?.startsWith("/wishlist")
+                      ? "bg-white/20 text-white"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
                 >
                   Wishlist 🔖
                 </Link>
                 <Link
                   href="/history"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/portfolio/history"
-                    ? "bg-white/20 text-white"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                    }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/portfolio/history"
+                      ? "bg-white/20 text-white"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
                 >
                   History 📜
                 </Link>
                 <Link
                   href="/news"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${pathname === "/news"
-                    ? "bg-white/20 text-white"
-                    : "text-white/80 hover:bg-white/10 hover:text-white"
-                    }`}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === "/news"
+                      ? "bg-white/20 text-white"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
+                  }`}
                 >
                   News 📰
                 </Link>
@@ -215,14 +229,17 @@ export default function Navbar() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex-1 min-w-0 max-w-xs sm:max-w-md mx-2 sm:mx-4" ref={searchRef}>
+          <div
+            className="flex-1 min-w-0 max-w-xs sm:max-w-md mx-2 sm:mx-4"
+            ref={searchRef}
+          >
             <div className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
                 placeholder="Search stocks..."
-                className="w-full rounded-lg bg-white/90 px-4 py-2 pr-10 text-gray-900 placeholder-gray-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="w-full rounded-lg bg-white/90 dark:bg-gray-800/90 px-4 py-2 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50"
                 autoComplete="off"
               />
               {isSearching && (
@@ -233,20 +250,25 @@ export default function Navbar() {
 
               {/* Search Suggestions Dropdown */}
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 rounded-lg border border-gray-200 bg-white shadow-xl max-h-96 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl max-h-96 overflow-y-auto">
                   {suggestions.map((suggestion) => (
                     <div
                       key={suggestion.symbol}
-                      className="relative border-b border-gray-100 last:border-b-0"
+                      className="relative border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                     >
-                      <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50">
+                      <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
                         <StockLogo symbol={suggestion.symbol} size="md" />
-                        <div className="flex-1 min-w-0"
+                        <div
+                          className="flex-1 min-w-0"
                           onClick={(e) => handleRowClick(suggestion.symbol, e)}
                           title={suggestion.name}
                         >
-                          <div className="font-semibold text-gray-900">{suggestion.symbol}</div>
-                          <div className="text-sm text-gray-600 truncate">{suggestion.name}</div>
+                          <div className="font-semibold text-gray-900 dark:text-gray-100">
+                            {suggestion.symbol}
+                          </div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                            {suggestion.name}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -257,31 +279,36 @@ export default function Navbar() {
           </div>
 
           {/* User Menu or Auth Buttons */}
-          {user ? (
-            <div className="flex items-center gap-4">
-              <span className="hidden sm:block text-sm text-white/90">
-                {user.name}
-              </span>
-              <button
-                onClick={signOut}
-                className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors"
-              >
-                Sign Out
-              </button>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span className="hidden sm:block text-sm text-white/90">
+                  {user.name}
+                </span>
+                <button
+                  onClick={signOut}
+                  className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    setAuthModalMode("signin");
+                    setShowAuthModal(true);
+                  }}
+                  className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors"
+                >
+                  Sign In
+                </button>
+              </div>
+            )}
+            <div className="bg-white/10 rounded-lg">
+              <ThemeToggle />
             </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  setAuthModalMode("signin");
-                  setShowAuthModal(true);
-                }}
-                className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors"
-              >
-                Sign In
-              </button>
-            </div>
-          )}
+          </div>
 
           {/*Mobile menu*/}
           <div className="md:hidden">
@@ -291,37 +318,58 @@ export default function Navbar() {
                 className="rounded-md p-2 text-white hover:bg-white/20 transition-colors"
               >
                 {showMobileMenu ? (
-                  <X className="h-6 w-6" />
+                  <X className="h-6 w-6 gap-4" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-6 w-6 gap-4" />
                 )}
               </button>
             )}
             {/* Mobile dropdown — renders below navbar */}
             {user && showMobileMenu && (
-              <div className="fixed top-16 left-0 right-0 z-50 border-t border-white/20 bg-white shadow-xl">
+              <div className="fixed top-16 left-0 right-0 z-50 border-t border-white/20 bg-white dark:bg-gray-800 shadow-xl">
                 <div className="flex flex-col p-3">
                   {[
-                    { href: "/portfolio", label: "Portfolio 💼", match: pathname === "/portfolio" },
-                    { href: "/wishlist",  label: "Wishlist 🔖",  match: pathname?.startsWith("/wishlist") },
-                    { href: "/history",  label: "History 📜",   match: pathname === "/history" },
-                    { href: "/news",     label: "News 📰",      match: pathname === "/news" },
+                    {
+                      href: "/portfolio",
+                      label: "Portfolio 💼",
+                      match: pathname === "/portfolio",
+                    },
+                    {
+                      href: "/wishlist",
+                      label: "Wishlist 🔖",
+                      match: pathname?.startsWith("/wishlist"),
+                    },
+                    {
+                      href: "/history",
+                      label: "History 📜",
+                      match: pathname === "/history",
+                    },
+                    {
+                      href: "/news",
+                      label: "News 📰",
+                      match: pathname === "/news",
+                    },
                   ].map(({ href, label, match }) => (
                     <Link
                       key={href}
                       href={href}
                       onClick={() => setShowMobileMenu(false)}
                       className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                        match ? "bg-blue-50 text-blue-600" : "text-gray-700 hover:bg-gray-100"
+                        match
+                          ? "bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                     >
                       {label}
                     </Link>
                   ))}
-                  <div className="border-t border-gray-100 mt-2 pt-2">
+                  <div className="border-t border-gray-100 dark:border-gray-700 mt-2 pt-2">
                     <button
-                      onClick={() => { signOut(); setShowMobileMenu(false); }}
-                      className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                      onClick={() => {
+                        signOut();
+                        setShowMobileMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       Sign Out
                     </button>

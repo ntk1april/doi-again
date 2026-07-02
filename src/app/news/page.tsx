@@ -66,31 +66,31 @@ export default function NewsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Market News 📰</h1>
-            <p className="mt-2 text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Market News 📰</h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               Stay updated with the latest market trends and financial news
             </p>
             {!isLoadingNews && allNews.length > 0 && (
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Showing {startIndex + 1}-{Math.min(endIndex, allNews.length)} of {allNews.length} articles
               </p>
             )}
           </div>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-1 shrink-0">
+          <div className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1 shrink-0">
             <button
               onClick={() => toggleView("card")}
               title="Card view"
               className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
                 viewMode === "card"
                   ? "bg-blue-500 text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-800"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -107,7 +107,7 @@ export default function NewsPage() {
               className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
                 viewMode === "list"
                   ? "bg-blue-500 text-white shadow-sm"
-                  : "text-gray-500 hover:text-gray-800"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               }`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -121,7 +121,7 @@ export default function NewsPage() {
         {/* Market News Section */}
         {isLoadingNews ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading market news...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading market news...</p>
           </div>
         ) : currentNews.length > 0 ? (
           <>
@@ -132,7 +132,7 @@ export default function NewsPage() {
                   href={news.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`block bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow border border-gray-200 ${
+                  className={`block bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-700 ${
                     viewMode === "list" ? "flex flex-col sm:flex-row gap-4" : ""
                   }`}
                 >
@@ -147,13 +147,13 @@ export default function NewsPage() {
                     />
                   )}
                   <div className={viewMode === "list" ? "flex-1" : ""}>
-                    <h3 className={`font-bold text-gray-900 mb-2 ${viewMode === "card" ? "line-clamp-2" : "line-clamp-1 sm:line-clamp-2"}`}>
+                    <h3 className={`font-bold text-gray-900 dark:text-gray-100 mb-2 ${viewMode === "card" ? "line-clamp-2" : "line-clamp-1 sm:line-clamp-2"}`}>
                       {news.headline}
                     </h3>
-                    <p className={`text-sm text-gray-600 mb-3 ${viewMode === "card" ? "line-clamp-3" : "line-clamp-2"}`}>
+                    <p className={`text-sm text-gray-600 dark:text-gray-400 mb-3 ${viewMode === "card" ? "line-clamp-3" : "line-clamp-2"}`}>
                       {news.summary}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                       <span>{news.source}</span>
                       <span>{new Date(news.datetime * 1000).toLocaleDateString()}</span>
                     </div>
@@ -169,7 +169,7 @@ export default function NewsPage() {
                 <button
                   onClick={goToPreviousPage}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   ← Previous
                 </button>
@@ -188,7 +188,7 @@ export default function NewsPage() {
                       (page === currentPage + 2 && currentPage < totalPages - 2);
 
                     if (showEllipsis) {
-                      return <span key={page} className="px-2 py-2 text-gray-500">...</span>;
+                      return <span key={page} className="px-2 py-2 text-gray-500 dark:text-gray-400">...</span>;
                     }
 
                     if (!showPage) return null;
@@ -199,7 +199,7 @@ export default function NewsPage() {
                         onClick={() => goToPage(page)}
                         className={`px-4 py-2 rounded-md transition-colors ${currentPage === page
                             ? "bg-blue-500 text-white"
-                            : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                            : "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                           }`}
                       >
                         {page}
@@ -212,7 +212,7 @@ export default function NewsPage() {
                 <button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Next →
                 </button>
@@ -220,8 +220,8 @@ export default function NewsPage() {
             )}
           </>
         ) : (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-            <p className="text-gray-600">No market news available at the moment</p>
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <p className="text-gray-600 dark:text-gray-400">No market news available at the moment</p>
           </div>
         )}
       </div>

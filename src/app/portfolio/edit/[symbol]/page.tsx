@@ -137,9 +137,9 @@ export default function EditStockPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center py-12">
-            <p className="text-gray-600">Loading stock details...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading stock details...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -149,7 +149,7 @@ export default function EditStockPage() {
   if (!stock) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl">
             <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
               {error || "Stock not found"}
@@ -167,59 +167,59 @@ export default function EditStockPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Buy/Sell {stock.symbol}</h1>
-            <p className="mt-2 text-gray-600">Buy more or sell this stock</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Buy/Sell {stock.symbol}</h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">Buy more or sell this stock</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2">
             {/* Stock Details Card */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Current Data</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Current Data</h2>
                 <StockLogo symbol={stock.symbol} size="lg" />
               </div>
 
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Symbol:</span>
-                  <span className="font-semibold text-gray-900">{stock.symbol}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Symbol:</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{stock.symbol}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Units:</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-gray-600 dark:text-gray-400">Units:</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatNumber(stock.units, 7)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Average Price:</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-gray-600 dark:text-gray-400">Average Price:</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatNumber(stock.avgPrice, 4)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Current Price:</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-gray-600 dark:text-gray-400">Current Price:</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatCurrency(currentPrice)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Total Cost:</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-gray-600 dark:text-gray-400">Total Cost:</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatCurrency(stock.avgPrice * stock.units)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Current Value:</span>
-                  <span className="font-semibold text-gray-900">
+                  <span className="text-gray-600 dark:text-gray-400">Current Value:</span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatCurrency(currentPrice * stock.units)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Realized P/L:</span>
+                  <span className="text-gray-600 dark:text-gray-400">Realized P/L:</span>
                   <span
                     className={`font-semibold ${stock.realizedPnl >= 0 ? "text-green-600" : "text-red-600"
                       }`}
@@ -231,10 +231,10 @@ export default function EditStockPage() {
             </div>
 
             {/* Form Card */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
               {/* Action Selector */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Action
                 </label>
                 <div className="flex gap-4">
@@ -247,7 +247,7 @@ export default function EditStockPage() {
                       disabled={isSubmitting}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">Buy More</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Buy More</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -258,7 +258,7 @@ export default function EditStockPage() {
                       disabled={isSubmitting}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">Sell</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">Sell</span>
                   </label>
                 </div>
               </div>
@@ -267,7 +267,7 @@ export default function EditStockPage() {
               {successMessage && (
                 <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
                   {successMessage}
-                  <p className="mt-2 text-xs text-gray-600">Redirecting to portfolio...</p>
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">Redirecting to portfolio...</p>
                 </div>
               )}
 

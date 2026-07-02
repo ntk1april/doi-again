@@ -59,24 +59,24 @@ export default function PortfolioSummary({
   return (
     <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
       {/* Total Invested */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-sm font-medium text-gray-600">Total Invested 💵</p>
-        <p className="mt-2 text-2xl font-bold text-gray-900">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Invested 💵</p>
+        <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-100">
           {mask(formatCurrency(convertValue(summary.totalInvested), currency))}
         </p>
       </div>
 
       {/* Current Value */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-sm font-medium text-gray-600">Current Value 💸</p>
-        <p className="mt-2 text-2xl font-bold text-gray-900">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Current Value 💸</p>
+        <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-100">
           {mask(formatCurrency(convertValue(summary.currentValue), currency))}
         </p>
       </div>
 
       {/* Net P/L */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-sm font-medium text-gray-600">Net P/L 💰</p>
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Net P/L 💰</p>
         <p
           className={`mt-2 text-2xl font-bold ${
             isProfit ? "text-green-600" : "text-red-600"
@@ -94,8 +94,8 @@ export default function PortfolioSummary({
       </div>
 
       {/* Top Gainer */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-sm font-medium text-gray-600">Top Gainer 📈</p>
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Gainer 📈</p>
         {topGainer ? (
           <>
             <p className="mt-2 text-2xl font-bold text-green-600">
@@ -113,13 +113,13 @@ export default function PortfolioSummary({
             </div>
           </>
         ) : (
-          <p className="mt-2 text-sm text-gray-400">No data</p>
+          <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">No data</p>
         )}
       </div>
 
       {/* Top Loser */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-sm font-medium text-gray-600">Top Loser 📉</p>
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm">
+        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Top Loser 📉</p>
         {topLoser ? (
           <>
             <p className="mt-2 text-2xl font-bold text-red-600">
@@ -136,7 +136,7 @@ export default function PortfolioSummary({
             </div>
           </>
         ) : (
-          <p className="mt-2 text-sm text-gray-400">No data</p>
+          <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">No data</p>
         )}
       </div>
     </div>

@@ -83,7 +83,7 @@ async function fetchFromPrimaryAPI() {
     }
 
     const data = await response.json();
-    console.log("Primary API response:", JSON.stringify(data, null, 2));
+    // console.log("Primary API response:", JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
     console.error("Primary API error:", error);
@@ -107,7 +107,7 @@ async function fetchFromFallbackAPI() {
     }
 
     const data = await response.json();
-    console.log("Fallback API response:", JSON.stringify(data, null, 2));
+    // console.log("Fallback API response:", JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
     console.error("Fallback API error:", error);
