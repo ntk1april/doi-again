@@ -205,14 +205,14 @@ export default function Navbar() {
                   Wishlist 🔖
                 </Link>
                 <Link
-                  href="/history"
+                  href="/transaction"
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === "/portfolio/history"
+                    pathname === "portfolio/transaction"
                       ? "bg-white/20 text-white"
                       : "text-white/80 hover:bg-white/10 hover:text-white"
                   }`}
                 >
-                  History 📜
+                  Transaction 📜
                 </Link>
                 <Link
                   href="/news"
@@ -340,9 +340,9 @@ export default function Navbar() {
                       match: pathname?.startsWith("/wishlist"),
                     },
                     {
-                      href: "/history",
-                      label: "History 📜",
-                      match: pathname === "/history",
+                      href: "/transaction",
+                      label: "Transaction 📜",
+                      match: pathname === "/transaction",
                     },
                     {
                       href: "/news",

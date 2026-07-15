@@ -150,12 +150,22 @@ export default function HomePage() {
             </div>
 
             {/* Motivational Quote */}
-            <div className="max-w-2xl mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+            <div
+              className="max-w-2xl mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer select-none hover:shadow-xl transition-shadow group"
+              onClick={() =>
+                setCurrentIndex((prev) =>
+                  prev === investorQuotes.length - 1 ? 0 : prev + 1,
+                )
+              }
+              title="Click for next quote"
+            >
               <div className="text-2xl text-gray-800 dark:text-gray-200 italic mb-4">
                 "{currentQuote.text}"
               </div>
-              <div className="text-gray-600 dark:text-gray-400 font-semibold">
-                — {currentQuote.author}
+              <div className="flex items-center justify-between">
+                <div className="text-gray-600 dark:text-gray-400 font-semibold">
+                  — {currentQuote.author}
+                </div>
               </div>
             </div>
           </div>

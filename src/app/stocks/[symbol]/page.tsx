@@ -43,7 +43,9 @@ export default function StockDetailPage() {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signin");
+  const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">(
+    "signin",
+  );
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [newsLoading, setNewsLoading] = useState(false);
 
@@ -111,8 +113,8 @@ export default function StockDetailPage() {
           ? portfolioData.data
           : portfolioData.data.stocks || [];
 
-        const inPortfolio = stocks.some((stock: any) =>
-          stock.symbol.toUpperCase() === symbol.toUpperCase()
+        const inPortfolio = stocks.some(
+          (stock: any) => stock.symbol.toUpperCase() === symbol.toUpperCase(),
         );
         setIsInPortfolio(inPortfolio);
       }
@@ -121,8 +123,8 @@ export default function StockDetailPage() {
       const wishlistResponse = await authFetch("/api/wishlist");
       const wishlistData = await wishlistResponse.json();
       if (wishlistData.success && wishlistData.data) {
-        const inWishlist = wishlistData.data.some((item: any) =>
-          item.symbol.toUpperCase() === symbol.toUpperCase()
+        const inWishlist = wishlistData.data.some(
+          (item: any) => item.symbol.toUpperCase() === symbol.toUpperCase(),
         );
         setIsInWishlist(inWishlist);
       }
@@ -184,7 +186,7 @@ export default function StockDetailPage() {
       cancelButtonText: "เก็บไว้ก่อน ตัวนี้น่าสน",
       confirmButtonColor: "#F93827",
       cancelButtonColor: "#16C47F",
-    })
+    });
 
     if (result.isConfirmed) {
       try {
@@ -223,15 +225,17 @@ export default function StockDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <p className="text-gray-600 dark:text-gray-400">Loading stock details...</p>
+      <div className="bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <p className="text-gray-600 dark:text-gray-400">
+          Loading stock details...
+        </p>
       </div>
     );
   }
 
   if (error || !stockDetails) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+      <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4">
         <div className="mx-auto max-w-7xl">
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
             {error || "Stock not found"}
@@ -258,9 +262,13 @@ export default function StockDetailPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <StockLogo symbol={symbol} size="lg" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{symbol}</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                  {symbol}
+                </h1>
                 {profile?.name && (
-                  <p className="mt-1 text-gray-600 dark:text-gray-400">{profile.name}</p>
+                  <p className="mt-1 text-gray-600 dark:text-gray-400">
+                    {profile.name}
+                  </p>
                 )}
               </div>
             </div>
@@ -320,17 +328,25 @@ export default function StockDetailPage() {
             <div className="mb-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Current Price</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Current Price
+                  </p>
                   <p className="text-4xl font-bold text-gray-900 dark:text-gray-100">
                     ${quote.c?.toFixed(2) || "N/A"}
                   </p>
                 </div>
                 <div className="sm:text-right">
-                  <p className={`text-2xl font-semibold ${quote.d >= 0 ? "text-green-600" : "text-red-600"}`}>
-                    {quote.d >= 0 ? "+" : ""}{quote.d?.toFixed(2)} ({quote.dp?.toFixed(2)}%)
+                  <p
+                    className={`text-2xl font-semibold ${
+                      quote.d >= 0 ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {quote.d >= 0 ? "+" : ""}
+                    {quote.d?.toFixed(2)} ({quote.dp?.toFixed(2)}%)
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Open: ${quote.o?.toFixed(2)} | High: ${quote.h?.toFixed(2)} | Low: ${quote.l?.toFixed(2)}
+                    Open: ${quote.o?.toFixed(2)} | High: ${quote.h?.toFixed(2)}{" "}
+                    | Low: ${quote.l?.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -341,35 +357,55 @@ export default function StockDetailPage() {
             {/* Company Info Card */}
             {profile && (
               <div className="lg:col-span-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Company Info</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  Company Info
+                </h2>
                 <div className="space-y-3 text-sm">
                   {profile.country && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Country:</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.country}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Country:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {profile.country}
+                      </span>
                     </div>
                   )}
                   {profile.exchange && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Exchange:</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.exchange}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Exchange:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {profile.exchange}
+                      </span>
                     </div>
                   )}
                   {profile.finnhubIndustry && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Industry:</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.finnhubIndustry}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Industry:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {profile.finnhubIndustry}
+                      </span>
                     </div>
                   )}
                   {profile.ipo && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">IPO Date:</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{profile.ipo}</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        IPO Date:
+                      </span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {profile.ipo}
+                      </span>
                     </div>
                   )}
                   {profile.marketCapitalization && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-400">Market Cap:</span>
+                      <span className="text-gray-600 dark:text-gray-400">
+                        Market Cap:
+                      </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
                         ${(profile.marketCapitalization / 1000).toFixed(2)}B
                       </span>
@@ -396,11 +432,15 @@ export default function StockDetailPage() {
               {/* Financial Metrics */}
               {metrics?.metric && (
                 <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Financial Metrics</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                    Financial Metrics
+                  </h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {metrics.metric.peBasicExclExtraTTM && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">P/E Ratio</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          P/E Ratio
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.peBasicExclExtraTTM.toFixed(2)}
                         </p>
@@ -408,7 +448,9 @@ export default function StockDetailPage() {
                     )}
                     {metrics.metric.pbAnnual && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">P/B Ratio</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          P/B Ratio
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.pbAnnual.toFixed(2)}
                         </p>
@@ -416,23 +458,35 @@ export default function StockDetailPage() {
                     )}
                     {metrics.metric.epsBasicExclExtraItemsAnnual && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">EPS</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          EPS
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                          ${metrics.metric.epsBasicExclExtraItemsAnnual.toFixed(2)}
+                          $
+                          {metrics.metric.epsBasicExclExtraItemsAnnual.toFixed(
+                            2,
+                          )}
                         </p>
                       </div>
                     )}
                     {metrics.metric.dividendYieldIndicatedAnnual && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Dividend Yield</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Dividend Yield
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                          {metrics.metric.dividendYieldIndicatedAnnual.toFixed(2)}%
+                          {metrics.metric.dividendYieldIndicatedAnnual.toFixed(
+                            2,
+                          )}
+                          %
                         </p>
                       </div>
                     )}
                     {metrics.metric.beta && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Beta</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Beta
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.beta.toFixed(2)}
                         </p>
@@ -440,7 +494,9 @@ export default function StockDetailPage() {
                     )}
                     {metrics.metric["52WeekHigh"] && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">52W High</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          52W High
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           ${metrics.metric["52WeekHigh"].toFixed(2)}
                         </p>
@@ -448,7 +504,9 @@ export default function StockDetailPage() {
                     )}
                     {metrics.metric["52WeekLow"] && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">52W Low</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          52W Low
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           ${metrics.metric["52WeekLow"].toFixed(2)}
                         </p>
@@ -456,7 +514,9 @@ export default function StockDetailPage() {
                     )}
                     {metrics.metric.roeRfy && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">ROE</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          ROE
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.roeRfy.toFixed(2)}%
                         </p>
@@ -464,7 +524,9 @@ export default function StockDetailPage() {
                     )}
                     {metrics.metric.roaRfy && (
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">ROA</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          ROA
+                        </p>
                         <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           {metrics.metric.roaRfy.toFixed(2)}%
                         </p>
@@ -483,27 +545,55 @@ export default function StockDetailPage() {
                     </h2>
                     {/* Overall Recommendation Summary */}
                     {(() => {
-                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
-                        latestRecommendation.hold + latestRecommendation.sell +
+                      const total =
+                        latestRecommendation.strongBuy +
+                        latestRecommendation.buy +
+                        latestRecommendation.hold +
+                        latestRecommendation.sell +
                         latestRecommendation.strongSell;
 
                       // Calculate which recommendation has the most votes
                       const recommendations = [
-                        { label: "Strong Buy", value: latestRecommendation.strongBuy, color: "bg-green-700 text-white" },
-                        { label: "Buy", value: latestRecommendation.buy, color: "bg-green-600 text-white" },
-                        { label: "Hold", value: latestRecommendation.hold, color: "bg-gray-600 text-white" },
-                        { label: "Sell", value: latestRecommendation.sell, color: "bg-red-600 text-white" },
-                        { label: "Strong Sell", value: latestRecommendation.strongSell, color: "bg-red-700 text-white" },
+                        {
+                          label: "Strong Buy",
+                          value: latestRecommendation.strongBuy,
+                          color: "bg-green-700 text-white",
+                        },
+                        {
+                          label: "Buy",
+                          value: latestRecommendation.buy,
+                          color: "bg-green-600 text-white",
+                        },
+                        {
+                          label: "Hold",
+                          value: latestRecommendation.hold,
+                          color: "bg-gray-600 text-white",
+                        },
+                        {
+                          label: "Sell",
+                          value: latestRecommendation.sell,
+                          color: "bg-red-600 text-white",
+                        },
+                        {
+                          label: "Strong Sell",
+                          value: latestRecommendation.strongSell,
+                          color: "bg-red-700 text-white",
+                        },
                       ];
 
-                      const topRecommendation = recommendations.reduce((prev, current) =>
-                        (current.value > prev.value) ? current : prev
+                      const topRecommendation = recommendations.reduce(
+                        (prev, current) =>
+                          current.value > prev.value ? current : prev,
                       );
 
                       return (
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Consensus:</span>
-                          <span className={`px-4 py-2 rounded-lg font-semibold text-sm ${topRecommendation.color}`}>
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            Consensus:
+                          </span>
+                          <span
+                            className={`px-4 py-2 rounded-lg font-semibold text-sm ${topRecommendation.color}`}
+                          >
                             {topRecommendation.label}
                           </span>
                         </div>
@@ -513,17 +603,25 @@ export default function StockDetailPage() {
                   <div className="space-y-3">
                     {/* Strong Buy */}
                     {(() => {
-                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
-                        latestRecommendation.hold + latestRecommendation.sell +
+                      const total =
+                        latestRecommendation.strongBuy +
+                        latestRecommendation.buy +
+                        latestRecommendation.hold +
+                        latestRecommendation.sell +
                         latestRecommendation.strongSell;
-                      const percentage = (latestRecommendation.strongBuy / total) * 100;
+                      const percentage =
+                        (latestRecommendation.strongBuy / total) * 100;
 
                       return (
                         <div className="flex items-center gap-4">
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm font-medium text-green-700">Strong Buy</span>
-                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.strongBuy}</span>
+                              <span className="text-sm font-medium text-green-700">
+                                Strong Buy
+                              </span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                {latestRecommendation.strongBuy}
+                              </span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -538,17 +636,25 @@ export default function StockDetailPage() {
 
                     {/* Buy */}
                     {(() => {
-                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
-                        latestRecommendation.hold + latestRecommendation.sell +
+                      const total =
+                        latestRecommendation.strongBuy +
+                        latestRecommendation.buy +
+                        latestRecommendation.hold +
+                        latestRecommendation.sell +
                         latestRecommendation.strongSell;
-                      const percentage = (latestRecommendation.buy / total) * 100;
+                      const percentage =
+                        (latestRecommendation.buy / total) * 100;
 
                       return (
                         <div className="flex items-center gap-4">
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm font-medium text-green-600">Buy</span>
-                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.buy}</span>
+                              <span className="text-sm font-medium text-green-600">
+                                Buy
+                              </span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                {latestRecommendation.buy}
+                              </span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -563,17 +669,25 @@ export default function StockDetailPage() {
 
                     {/* Hold */}
                     {(() => {
-                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
-                        latestRecommendation.hold + latestRecommendation.sell +
+                      const total =
+                        latestRecommendation.strongBuy +
+                        latestRecommendation.buy +
+                        latestRecommendation.hold +
+                        latestRecommendation.sell +
                         latestRecommendation.strongSell;
-                      const percentage = (latestRecommendation.hold / total) * 100;
+                      const percentage =
+                        (latestRecommendation.hold / total) * 100;
 
                       return (
                         <div className="flex items-center gap-4">
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Hold</span>
-                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.hold}</span>
+                              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                Hold
+                              </span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                {latestRecommendation.hold}
+                              </span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -588,17 +702,25 @@ export default function StockDetailPage() {
 
                     {/* Sell */}
                     {(() => {
-                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
-                        latestRecommendation.hold + latestRecommendation.sell +
+                      const total =
+                        latestRecommendation.strongBuy +
+                        latestRecommendation.buy +
+                        latestRecommendation.hold +
+                        latestRecommendation.sell +
                         latestRecommendation.strongSell;
-                      const percentage = (latestRecommendation.sell / total) * 100;
+                      const percentage =
+                        (latestRecommendation.sell / total) * 100;
 
                       return (
                         <div className="flex items-center gap-4">
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm font-medium text-red-600">Sell</span>
-                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.sell}</span>
+                              <span className="text-sm font-medium text-red-600">
+                                Sell
+                              </span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                {latestRecommendation.sell}
+                              </span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -613,17 +735,25 @@ export default function StockDetailPage() {
 
                     {/* Strong Sell */}
                     {(() => {
-                      const total = latestRecommendation.strongBuy + latestRecommendation.buy +
-                        latestRecommendation.hold + latestRecommendation.sell +
+                      const total =
+                        latestRecommendation.strongBuy +
+                        latestRecommendation.buy +
+                        latestRecommendation.hold +
+                        latestRecommendation.sell +
                         latestRecommendation.strongSell;
-                      const percentage = (latestRecommendation.strongSell / total) * 100;
+                      const percentage =
+                        (latestRecommendation.strongSell / total) * 100;
 
                       return (
                         <div className="flex items-center gap-4">
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <span className="text-sm font-medium text-red-700">Strong Sell</span>
-                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{latestRecommendation.strongSell}</span>
+                              <span className="text-sm font-medium text-red-700">
+                                Strong Sell
+                              </span>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                {latestRecommendation.strongSell}
+                              </span>
                             </div>
                             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
@@ -653,73 +783,82 @@ export default function StockDetailPage() {
 
             {newsLoading ? (
               <div className="text-center py-12">
-                <p className="text-gray-600 dark:text-gray-400">Loading news...</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Loading news...
+                </p>
               </div>
             ) : news.length > 0 ? (
               <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Headline
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Source
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Date
-                      </th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        {/* Action */}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {news.map((article, index) => (
-                      <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                        {/* Headline */}
-                        <td className="px-6 py-4">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
-                              {article.headline}
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                              {article.summary}
-                            </p>
-                          </div>
-                        </td>
-
-                        {/* Source */}
-                        <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                          {article.source}
-                        </td>
-
-                        {/* Date */}
-                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                          {new Date(article.datetime * 1000).toLocaleDateString()}
-                        </td>
-
-                        {/* Action */}
-                        <td className="px-6 py-4 text-center">
-                          <a
-                            href={article.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-block rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
-                          >
-                            Read More
-                          </a>
-                        </td>
+                    <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Headline
+                        </th>
+                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Source
+                        </th>
+                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          {/* Action */}
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {news.map((article, index) => (
+                        <tr
+                          key={article.id}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          {/* Headline */}
+                          <td className="px-6 py-4">
+                            <div>
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
+                                {article.headline}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                {article.summary}
+                              </p>
+                            </div>
+                          </td>
+
+                          {/* Source */}
+                          <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                            {article.source}
+                          </td>
+
+                          {/* Date */}
+                          <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            {new Date(
+                              article.datetime * 1000,
+                            ).toLocaleDateString()}
+                          </td>
+
+                          {/* Action */}
+                          <td className="px-6 py-4 text-center">
+                            <a
+                              href={article.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-block rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                            >
+                              Read More
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                   </table>
                 </div>
               </div>
             ) : (
               <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                <p className="text-gray-600 dark:text-gray-400">No recent news available for {symbol}</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  No recent news available for {symbol}
+                </p>
               </div>
             )}
           </div>

@@ -10,7 +10,7 @@ https://doi-again.vercel.app/
 
 ### 📊 Portfolio Management
 
-- **Real-time Stock Prices** - Integration with Finnhub API
+- **Stock Prices** - Integration with Finnhub API
 - **Profit/Loss Tracking** - Automatic calculation of realized and unrealized P/L
 - **Portfolio Summary** - Overview of total investment, current value, and net P/L
 - **Stock Logos** - Visual identification with automatic 2-letter fallback
@@ -79,8 +79,8 @@ https://doi-again.vercel.app/
 1. **Clone the repository**
 
    ```bash
-   git clone <your-repo-url>
-   cd doy-again
+   git clone https://github.com/ntk1april/doi-again.git
+   cd doi-again
    ```
 
 2. **Install dependencies**
@@ -201,7 +201,7 @@ https://doi-again.vercel.app/
 ## 📁 Project Structure
 
 ```
-doy-again/
+doi-again/
 ├── src/
 │   ├── app/                      # Next.js App Router
 │   │   ├── api/                  # API routes
@@ -390,4 +390,4 @@ Built with ❤️ using Next.js, TypeScript, and MongoDB
 
 # 🚀 Let's try and see your money losing 😜
 
-https://doy-again.vercel.app/
+https://doi-again.vercel.app/

@@ -198,7 +198,9 @@ export default function StockForm({
                 >
                   <StockLogo symbol={item.symbol} size="md" />
                   <div className="flex-1 min-w-0" title={item.name}>
-                    <div className="font-medium text-black dark:text-white">{item.symbol}</div>
+                    <div className="font-medium text-black dark:text-white">
+                      {item.symbol}
+                    </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {item.name}
                     </div>
@@ -230,7 +232,7 @@ export default function StockForm({
           htmlFor="units"
           className="block text-sm font-bold text-gray-700 dark:text-gray-300"
         >
-          Units
+          Shares
         </label>
         <input
           id="units"

@@ -274,7 +274,7 @@ export default function PortfolioDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -286,7 +286,8 @@ export default function PortfolioDashboard() {
               Welcome, {user.name}! 👋
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+
+          <div className="flex justify-end flex-wrap items-center gap-2">
             {/* Hide Numbers Toggle */}
             <button
               onClick={() => setHideNumbers(!hideNumbers)}
@@ -371,7 +372,15 @@ export default function PortfolioDashboard() {
         </div>
 
         {/* Motivational Quote */}
-        <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 rounded-2xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800">
+        <div
+          className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 rounded-2xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800 cursor-pointer"
+          onClick={() =>
+            setCurrentIndex((prev) =>
+              prev === investorQuotes.length - 1 ? 0 : prev + 1,
+            )
+          }
+          title="Click for next quote"
+        >
           <div className="text-sm sm:text-lg text-gray-800 dark:text-gray-200 italic mb-2 line-clamp-3 sm:line-clamp-none">
             "{currentQuote.text}"
           </div>

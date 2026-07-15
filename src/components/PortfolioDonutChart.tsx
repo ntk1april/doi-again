@@ -1,11 +1,12 @@
 /**
  * PortfolioDonutChart
  * Two SVG donut charts: stock allocation by Units and by Total Cost
+ * Animates on mount using CSS stroke-dasharray/dashoffset trick.
  */
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Stock {
   symbol: string;
@@ -41,7 +42,7 @@ function donutArcPath(
   outerR: number,
   innerR: number,
   startAngle: number,
-  endAngle: number
+  endAngle: number,
 ): string {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const sa = toRad(startAngle);
@@ -76,12 +77,51 @@ interface DonutProps {
   onHover: (symbol: string | null) => void;
 }
 
-function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHover }: DonutProps) {
+function DonutChart({
+  data,
+  label,
+  formatValue,
+  hideNumbers,
+  hoveredSymbol,
+  onHover,
+}: DonutProps) {
   const total = data.reduce((s, d) => s + d.value, 0);
   const cx = 135;
   const cy = 135;
   const outerR = 105;
   const innerR = 70;
+
+  // Animation state: 0 → 1 progress
+  const [progress, setProgress] = useState(0);
+  const animRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const DURATION = 900; // ms
+
+  // Re-run animation whenever data changes
+  const dataKey = data.map((d) => d.label + d.value).join(",");
+
+  useEffect(() => {
+    setProgress(0);
+    startTimeRef.current = null;
+
+    const animate = (timestamp: number) => {
+      if (!startTimeRef.current) startTimeRef.current = timestamp;
+      const elapsed = timestamp - startTimeRef.current;
+      const t = Math.min(elapsed / DURATION, 1);
+      // Ease-out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      setProgress(eased);
+      if (t < 1) {
+        animRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataKey]);
 
   if (total === 0) {
     return (
@@ -89,17 +129,32 @@ function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHo
         <div className="w-44 h-44 flex items-center justify-center rounded-full border-4 border-gray-100 dark:border-gray-700 text-sm text-gray-400 dark:text-gray-500">
           No data
         </div>
-        <p className="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</p>
+        <p className="mt-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+          {label}
+        </p>
       </div>
     );
   }
 
+  // Circumference of the outer ring (used for draw-on animation)
+  const circumference = 2 * Math.PI * outerR;
+
   let currentAngle = -90; // Start at top
   const segments = data.map((d) => {
     const angle = (d.value / total) * 360;
-    const path = donutArcPath(cx, cy, outerR, innerR, currentAngle, currentAngle + angle - 0.5);
-    const midAngle = ((currentAngle + currentAngle + angle) / 2 * Math.PI) / 180;
-    currentAngle += angle;
+    // Animate the sweep: each segment sweeps `angle * progress` degrees
+    const animatedAngle = angle * progress;
+    const path = donutArcPath(
+      cx,
+      cy,
+      outerR,
+      innerR,
+      currentAngle,
+      currentAngle + animatedAngle - (progress < 1 ? 0 : 0.5),
+    );
+    const midAngle =
+      (((currentAngle + currentAngle + animatedAngle) / 2) * Math.PI) / 180;
+    currentAngle += angle; // always advance by full angle so positions are stable at end
     return { ...d, path, percent: (d.value / total) * 100, midAngle };
   });
 
@@ -109,9 +164,29 @@ function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHo
   return (
     <div className="flex flex-col items-center">
       <div className="relative w-full max-w-[200px] sm:max-w-[270px]">
-        <svg width="100%" viewBox="0 0 270 270">
+        <svg width="100%" viewBox="0 0 270 270" style={{ overflow: "visible" }}>
+          {/* Subtle shadow filter */}
+          <defs>
+            <filter
+              id="seg-shadow"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feDropShadow
+                dx="0"
+                dy="2"
+                stdDeviation="3"
+                floodOpacity="0.15"
+              />
+            </filter>
+          </defs>
+
           {segments.map((seg) => {
-            const isActive = hoveredSymbol === null || hoveredSymbol === seg.label;
+            const isActive =
+              hoveredSymbol === null || hoveredSymbol === seg.label;
+            const isHovered = hoveredSymbol === seg.label;
             return (
               <path
                 key={seg.label}
@@ -120,34 +195,71 @@ function DonutChart({ data, label, formatValue, hideNumbers, hoveredSymbol, onHo
                 opacity={isActive ? 1 : 0.25}
                 stroke="white"
                 strokeWidth="2"
-                className="cursor-pointer transition-opacity duration-200 stroke-white dark:stroke-gray-800"
+                filter={isHovered ? "url(#seg-shadow)" : undefined}
+                className="cursor-pointer stroke-white dark:stroke-gray-800"
+                style={{
+                  transition:
+                    "opacity 200ms ease, transform 200ms ease, filter 200ms ease",
+                  transformOrigin: `${cx}px ${cy}px`,
+                  transform: isHovered ? "scale(1.04)" : "scale(1)",
+                }}
                 onMouseEnter={() => onHover(seg.label)}
                 onMouseLeave={() => onHover(null)}
               />
             );
           })}
+
           {/* Center label */}
-          <text x={cx} y={cy - 8} textAnchor="middle" className="text-sm fill-gray-700 dark:fill-gray-300" fontSize="13" fontWeight="600">
+          <text
+            x={cx}
+            y={cy - 8}
+            textAnchor="middle"
+            className="text-sm fill-gray-700 dark:fill-gray-300"
+            fontSize="13"
+            fontWeight="600"
+            style={{ transition: "opacity 200ms" }}
+          >
             {hovered ? hovered.label : "Total"}
           </text>
-          <text x={cx} y={cy + 10} textAnchor="middle" className="fill-gray-500 dark:fill-gray-400" fontSize="11">
+          <text
+            x={cx}
+            y={cy + 10}
+            textAnchor="middle"
+            className="fill-gray-500 dark:fill-gray-400"
+            fontSize="11"
+          >
             {hovered
-              ? hideNumbers ? "••••••" : formatValue(hovered.value)
-              : hideNumbers ? "••••••" : formatValue(total)}
+              ? hideNumbers
+                ? "••••••"
+                : formatValue(hovered.value)
+              : hideNumbers
+              ? "••••••"
+              : formatValue(total)}
           </text>
           {hovered && (
-            <text x={cx} y={cy + 25} textAnchor="middle" className="fill-gray-400 dark:fill-gray-500" fontSize="10">
+            <text
+              x={cx}
+              y={cy + 25}
+              textAnchor="middle"
+              className="fill-gray-400 dark:fill-gray-500"
+              fontSize="10"
+            >
               {hovered.percent.toFixed(1)}%
             </text>
           )}
         </svg>
       </div>
-      <p className="mt-1 text-sm font-semibold text-gray-700 dark:text-gray-300">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-gray-700 dark:text-gray-300">
+        {label}
+      </p>
     </div>
   );
 }
 
-export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Props) {
+export default function PortfolioDonutChart({
+  stocks,
+  hideNumbers = false,
+}: Props) {
   const [hoveredSymbol, setHoveredSymbol] = useState<string | null>(null);
 
   if (!stocks || stocks.length === 0) return null;
@@ -169,14 +281,16 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
 
   return (
     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Portfolio Allocation</h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+        Portfolio Allocation
+      </h2>
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Charts — side by side on sm+, stacked on xs */}
         <div className="flex flex-wrap gap-4 sm:gap-8 justify-center w-full lg:w-auto flex-shrink-0">
           <DonutChart
             data={unitData}
-            label="By Units"
+            label="By Shares"
             formatValue={(v) => v.toFixed(2)}
             hideNumbers={hideNumbers}
             hoveredSymbol={hoveredSymbol}
@@ -185,7 +299,12 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
           <DonutChart
             data={costData}
             label="By Cost"
-            formatValue={(v) => `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            formatValue={(v) =>
+              `$${v.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}`
+            }
             hideNumbers={hideNumbers}
             hoveredSymbol={hoveredSymbol}
             onHover={setHoveredSymbol}
@@ -196,15 +315,19 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
         <div className="flex-1 min-w-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {stocks.map((stock, i) => {
-              const unitPct = totalUnits > 0 ? (stock.units / totalUnits) * 100 : 0;
-              const costPct = totalCost > 0 ? (stock.totalCost / totalCost) * 100 : 0;
-              const isActive = hoveredSymbol === null || hoveredSymbol === stock.symbol;
+              const unitPct =
+                totalUnits > 0 ? (stock.units / totalUnits) * 100 : 0;
+              const costPct =
+                totalCost > 0 ? (stock.totalCost / totalCost) * 100 : 0;
+              const isActive =
+                hoveredSymbol === null || hoveredSymbol === stock.symbol;
 
               return (
                 <div
                   key={stock.symbol}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-150 ${isActive ? "opacity-100" : "opacity-40"
-                    } hover:bg-gray-50 dark:hover:bg-gray-700`}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all duration-150 ${
+                    isActive ? "opacity-100" : "opacity-40"
+                  } hover:bg-gray-50 dark:hover:bg-gray-700`}
                   onMouseEnter={() => setHoveredSymbol(stock.symbol)}
                   onMouseLeave={() => setHoveredSymbol(null)}
                 >
@@ -215,10 +338,16 @@ export default function PortfolioDonutChart({ stocks, hideNumbers = false }: Pro
                   />
                   {/* Info */}
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{stock.symbol}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                      {stock.symbol}
+                    </p>
                     <div className="flex gap-3 text-xs text-gray-500 dark:text-gray-400">
-                      <span>Units: {hideNumbers ? "••" : `${unitPct.toFixed(1)}%`}</span>
-                      <span>Cost: {hideNumbers ? "••" : `${costPct.toFixed(1)}%`}</span>
+                      <span>
+                        Share: {hideNumbers ? "••" : `${unitPct.toFixed(1)}%`}
+                      </span>
+                      <span>
+                        Cost: {hideNumbers ? "••" : `${costPct.toFixed(1)}%`}
+                      </span>
                     </div>
                   </div>
                 </div>

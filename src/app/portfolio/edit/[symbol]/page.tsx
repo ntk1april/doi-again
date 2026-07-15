@@ -51,7 +51,7 @@ export default function EditStockPage() {
       // Find the specific stock from the portfolio
       const portfolioStocks = portfolioData.data?.stocks || [];
       const enrichedStock = portfolioStocks.find(
-        (s: any) => s.symbol === symbol
+        (s: any) => s.symbol === symbol,
       );
 
       if (!enrichedStock) {
@@ -80,7 +80,9 @@ export default function EditStockPage() {
   const handleSubmit = async (formData: FormData) => {
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: `You are about to ${action.toLowerCase()} ${formData.units} units of ${symbol} at ${formData.price} each!`,
+      text: `You are about to ${action.toLowerCase()} ${
+        formData.units
+      } units of ${symbol} at ${formData.price} each!`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: `Yes, ${action.toLowerCase()} it!`,
@@ -116,9 +118,13 @@ export default function EditStockPage() {
         }
 
         if (action === "SELL" && !stock?.units) {
-          setSuccessMessage("Stock completely sold and removed from portfolio!");
+          setSuccessMessage(
+            "Stock completely sold and removed from portfolio!",
+          );
         } else {
-          setSuccessMessage(`Successfully ${action.toLowerCase()}ed ${formData.units} units!`);
+          setSuccessMessage(
+            `Successfully ${action.toLowerCase()}ed ${formData.units} units!`,
+          );
         }
 
         // Refresh and redirect after 2 seconds
@@ -139,7 +145,9 @@ export default function EditStockPage() {
       <ProtectedRoute>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">Loading stock details...</p>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading stock details...
+            </p>
           </div>
         </div>
       </ProtectedRoute>
@@ -167,62 +175,85 @@ export default function EditStockPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Buy/Sell {stock.symbol}</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">Buy more or sell this stock</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              Buy/Sell {stock.symbol}
+            </h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
+              Buy more or sell this stock
+            </p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2">
             {/* Stock Details Card */}
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Current Data</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Current Data
+                </h2>
                 <StockLogo symbol={stock.symbol} size="lg" />
               </div>
 
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Symbol:</span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">{stock.symbol}</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Symbol:
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    {stock.symbol}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Units:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Shares:
+                  </span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatNumber(stock.units, 7)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Average Price:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Average Price:
+                  </span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatNumber(stock.avgPrice, 4)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Current Price:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Current Price:
+                  </span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatCurrency(currentPrice)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Total Cost:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Total Cost:
+                  </span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatCurrency(stock.avgPrice * stock.units)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Current Value:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Current Value:
+                  </span>
                   <span className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatCurrency(currentPrice * stock.units)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Realized P/L:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Realized P/L:
+                  </span>
                   <span
-                    className={`font-semibold ${stock.realizedPnl >= 0 ? "text-green-600" : "text-red-600"
-                      }`}
+                    className={`font-semibold ${
+                      stock.realizedPnl >= 0 ? "text-green-600" : "text-red-600"
+                    }`}
                   >
                     {formatCurrency(stock.realizedPnl)}
                   </span>
@@ -243,22 +274,30 @@ export default function EditStockPage() {
                       type="radio"
                       value="BUY"
                       checked={action === "BUY"}
-                      onChange={(e) => setAction(e.target.value as "BUY" | "SELL")}
+                      onChange={(e) =>
+                        setAction(e.target.value as "BUY" | "SELL")
+                      }
                       disabled={isSubmitting}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Buy More</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Buy More
+                    </span>
                   </label>
                   <label className="flex items-center">
                     <input
                       type="radio"
                       value="SELL"
                       checked={action === "SELL"}
-                      onChange={(e) => setAction(e.target.value as "BUY" | "SELL")}
+                      onChange={(e) =>
+                        setAction(e.target.value as "BUY" | "SELL")
+                      }
                       disabled={isSubmitting}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Sell</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      Sell
+                    </span>
                   </label>
                 </div>
               </div>
@@ -267,7 +306,9 @@ export default function EditStockPage() {
               {successMessage && (
                 <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
                   {successMessage}
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">Redirecting to portfolio...</p>
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                    Redirecting to portfolio...
+                  </p>
                 </div>
               )}
 
@@ -295,7 +336,10 @@ export default function EditStockPage() {
 
               {/* Back Link */}
               <div className="mt-4 text-center">
-                <Link href="/portfolio" className="text-sm text-blue-600 hover:underline">
+                <Link
+                  href="/portfolio"
+                  className="text-sm text-blue-600 hover:underline"
+                >
                   Back to Portfolio
                 </Link>
               </div>

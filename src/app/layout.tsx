@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Doi  Again | Stock Portfolio Tracker",
-  description: "Track your stock portfolio with real-time profit/loss calculations",
+  description:
+    "Track your stock portfolio with real-time profit/loss calculations",
 };
 
 export default function RootLayout({
@@ -32,8 +34,10 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            <Navbar />
-            {children}
+            <PullToRefresh>
+              <Navbar />
+              {children}
+            </PullToRefresh>
           </AuthProvider>
         </ThemeProvider>
       </body>
