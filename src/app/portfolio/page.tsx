@@ -22,6 +22,7 @@ import {
 } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/utils/auth-fetch";
+import { Loader2 } from "lucide-react";
 
 interface Quote {
   text: string;
@@ -262,11 +263,15 @@ export default function PortfolioDashboard() {
   };
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-      </div>
-    );
+    // return (
+    //   <div className="flex items-center justify-center h-64">
+    //     <div className="flex items-center gap-3 text-muted-foreground">
+    //       <Loader2 className="w-6 h-6 animate-spin" />
+    //       <span>Loading...</span>
+    //     </div>
+    //   </div>
+    // );
+    return;
   }
 
   if (!user) {
@@ -398,10 +403,11 @@ export default function PortfolioDashboard() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading portfolio...
-            </p>
+          <div className="flex items-center justify-center h-18">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span>Loading portfolio...</span>
+            </div>
           </div>
         )}
 

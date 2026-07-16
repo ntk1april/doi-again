@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import StockLogo from "@/components/StockLogo";
 import { authFetch } from "@/lib/utils/auth-fetch";
+import { Loader2 } from "lucide-react";
 import Swal from "sweetalert2";
 
 interface WishlistItem {
@@ -268,10 +269,11 @@ export default function WishlistPage() {
 
           {/* Loading State */}
           {isLoading && (
-            <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400">
-                Loading wishlist...
-              </p>
+            <div className="flex items-center justify-center h-100">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <span>Loading wishlist...</span>
+              </div>
             </div>
           )}
 

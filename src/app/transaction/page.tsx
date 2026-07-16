@@ -7,12 +7,15 @@ import { formatCurrency } from "@/lib/utils/calculations";
 import StockLogo from "@/components/StockLogo";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { authFetch } from "@/lib/utils/auth-fetch";
+import { Loader2 } from "lucide-react";
 
 type TimeFilter = "day" | "week" | "month" | "all";
 
 export default function TransactionHistoryPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    Transaction[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
@@ -96,14 +99,33 @@ export default function TransactionHistoryPage() {
   };
 
   const getTotalStats = () => {
-    const buyTransactions = filteredTransactions.filter((t) => t.type === "BUY");
-    const sellTransactions = filteredTransactions.filter((t) => t.type === "SELL");
+    const buyTransactions = filteredTransactions.filter(
+      (t) => t.type === "BUY",
+    );
+    const sellTransactions = filteredTransactions.filter(
+      (t) => t.type === "SELL",
+    );
 
-    const totalBought = buyTransactions.reduce((sum, t) => sum + t.units * t.price, 0);
-    const totalSold = sellTransactions.reduce((sum, t) => sum + t.units * t.price, 0);
-    const totalRealizedPnl = sellTransactions.reduce((sum, t) => sum + (t.realizedPnl || 0), 0);
+    const totalBought = buyTransactions.reduce(
+      (sum, t) => sum + t.units * t.price,
+      0,
+    );
+    const totalSold = sellTransactions.reduce(
+      (sum, t) => sum + t.units * t.price,
+      0,
+    );
+    const totalRealizedPnl = sellTransactions.reduce(
+      (sum, t) => sum + (t.realizedPnl || 0),
+      0,
+    );
 
-    return { totalBought, totalSold, totalRealizedPnl, buyCount: buyTransactions.length, sellCount: sellTransactions.length };
+    return {
+      totalBought,
+      totalSold,
+      totalRealizedPnl,
+      buyCount: buyTransactions.length,
+      sellCount: sellTransactions.length,
+    };
   };
 
   const stats = getTotalStats();
@@ -111,9 +133,10 @@ export default function TransactionHistoryPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="text-center text-gray-600 dark:text-gray-400">Loading transactions...</div>
+        <div className="flex items-center justify-center h-150">
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <Loader2 className="w-6 h-6 animate-spin" />
+            <span>Loading transactions...</span>
           </div>
         </div>
       </ProtectedRoute>
@@ -127,8 +150,12 @@ export default function TransactionHistoryPage() {
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Transaction History 📃</h1>
-              <p className="mt-1 text-gray-600 dark:text-gray-400">View all your stock transactions</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                Transaction History 📃
+              </h1>
+              <p className="mt-1 text-gray-600 dark:text-gray-400">
+                View all your stock transactions
+              </p>
             </div>
           </div>
 
@@ -138,10 +165,11 @@ export default function TransactionHistoryPage() {
               <button
                 key={filter}
                 onClick={() => setTimeFilter(filter)}
-                className={`rounded-md px-4 py-2 font-medium transition-colors ${timeFilter === filter
+                className={`rounded-md px-4 py-2 font-medium transition-colors ${
+                  timeFilter === filter
                     ? "bg-blue-500 text-white"
                     : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600"
-                  }`}
+                }`}
               >
                 {getFilterLabel(filter)}
               </button>
@@ -151,28 +179,48 @@ export default function TransactionHistoryPage() {
           {/* Stats Summary */}
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Transactions</div>
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Transactions
+              </div>
               <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {filteredTransactions.length}
               </div>
             </div>
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Buy Orders</div>
-              <div className="mt-1 text-2xl font-bold text-green-600">{stats.buyCount}</div>
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Buy Orders
+              </div>
+              <div className="mt-1 text-2xl font-bold text-green-600">
+                {stats.buyCount}
+              </div>
             </div>
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Sell Orders</div>
-              <div className="mt-1 text-2xl font-bold text-red-600">{stats.sellCount}</div>
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Sell Orders
+              </div>
+              <div className="mt-1 text-2xl font-bold text-red-600">
+                {stats.sellCount}
+              </div>
             </div>
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bought</div>
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Total Bought
+              </div>
               <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {formatCurrency(stats.totalBought)}
               </div>
             </div>
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">Realized P/L</div>
-              <div className={`mt-1 text-2xl font-bold ${stats.totalRealizedPnl >= 0 ? "text-green-600" : "text-red-600"}`}>
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                Realized P/L
+              </div>
+              <div
+                className={`mt-1 text-2xl font-bold ${
+                  stats.totalRealizedPnl >= 0
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
                 {formatCurrency(stats.totalRealizedPnl)}
               </div>
             </div>
@@ -197,13 +245,27 @@ export default function TransactionHistoryPage() {
               <table className="w-full text-sm">
                 <thead className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">Date</th>
-                    <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">Stock</th>
-                    <th className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-gray-100">Type</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">Units</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">Price</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">Total</th>
-                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">Realized P/L</th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">
+                      Date
+                    </th>
+                    <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">
+                      Stock
+                    </th>
+                    <th className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-gray-100">
+                      Type
+                    </th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
+                      Units
+                    </th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
+                      Price
+                    </th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
+                      Total
+                    </th>
+                    <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
+                      Realized P/L
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -232,10 +294,11 @@ export default function TransactionHistoryPage() {
                         {/* Type */}
                         <td className="px-4 py-3 text-center">
                           <span
-                            className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${isBuy
+                            className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                              isBuy
                                 ? "bg-green-100 text-green-700"
                                 : "bg-red-100 text-red-700"
-                              }`}
+                            }`}
                           >
                             {transaction.type}
                           </span>
@@ -258,15 +321,21 @@ export default function TransactionHistoryPage() {
 
                         {/* Realized P/L */}
                         <td className="px-4 py-3 text-right">
-                          {transaction.realizedPnl !== undefined && transaction.realizedPnl !== 0 ? (
+                          {transaction.realizedPnl !== undefined &&
+                          transaction.realizedPnl !== 0 ? (
                             <span
-                              className={`font-medium ${transaction.realizedPnl >= 0 ? "text-green-600" : "text-red-600"
-                                }`}
+                              className={`font-medium ${
+                                transaction.realizedPnl >= 0
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
                             >
                               {formatCurrency(transaction.realizedPnl)}
                             </span>
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-500">—</span>
+                            <span className="text-gray-400 dark:text-gray-500">
+                              —
+                            </span>
                           )}
                         </td>
                       </tr>

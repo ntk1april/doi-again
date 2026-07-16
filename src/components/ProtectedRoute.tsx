@@ -19,11 +19,12 @@ export default function ProtectedRoute({ children }: Props) {
   }, [user, isLoading, router]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    );
+    // return (
+    //   <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    //     <p className="text-gray-600">Loading...</p>
+    //   </div>
+    // );
+    return;
   }
 
   if (!user) {

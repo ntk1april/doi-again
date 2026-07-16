@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import PullToRefresh from "@/components/PullToRefresh";
+import NetworkStatusBanner from "@/components/NetworkStatusBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <PullToRefresh>
+              <NetworkStatusBanner />
               <Navbar />
               {children}
             </PullToRefresh>

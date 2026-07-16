@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function NewsPage() {
   const [allNews, setAllNews] = useState<any[]>([]);
@@ -133,10 +134,11 @@ export default function NewsPage() {
 
         {/* Market News Section */}
         {isLoadingNews ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading market news...
-            </p>
+          <div className="flex items-center justify-center h-100">
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span>Loading market news...</span>
+            </div>
           </div>
         ) : currentNews.length > 0 ? (
           <>

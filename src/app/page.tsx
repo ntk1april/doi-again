@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthModal from "@/components/AuthModal";
+import { Loader2 } from "lucide-react";
 
 interface Quote {
   text: string;
@@ -223,10 +224,11 @@ export default function HomePage() {
           </h2>
 
           {isLoadingNews ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400">
-                Loading market news...
-              </p>
+            <div className="flex items-center justify-center h-64">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <span>Loading news...</span>
+              </div>
             </div>
           ) : marketNews.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
