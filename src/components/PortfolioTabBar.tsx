@@ -100,7 +100,7 @@ export default function PortfolioTabBar({
                     </span>
                   )}
                   {/* Delete button — visible on hover */}
-                  {!isAll && (
+                  {/* {!isAll && (
                     <span
                       onClick={(e) => {
                         e.stopPropagation();
@@ -111,7 +111,7 @@ export default function PortfolioTabBar({
                     >
                       ×
                     </span>
-                  )}
+                  )} */}
                 </button>
               )}
             </div>
