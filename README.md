@@ -4,7 +4,7 @@ A modern, full-stack web application for tracking your stock portfolio with real
 
 # 🚀 Live Demo
 
-https://doi-again.vercel.app/
+Go to [Doi Again - Stock Portfolio Tracker](https://doi-again.vercel.app/) → Login with email `test@test.com` and password `Tt123456`.
 
 ## ✨ Features
 
