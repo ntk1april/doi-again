@@ -6,7 +6,25 @@ import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import StockLogo from "@/components/StockLogo";
 import { authFetch } from "@/lib/utils/auth-fetch";
-import { Loader2 } from "lucide-react";
+import {
+  Loader2,
+  Bookmark,
+  Search,
+  Trash2,
+  Edit3,
+  ExternalLink,
+  Target,
+  FileText,
+  Save,
+  X,
+  LayoutGrid,
+  Table,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import Swal from "sweetalert2";
 
 interface WishlistItem {
@@ -58,7 +76,6 @@ export default function WishlistPage() {
   useEffect(() => {
     if (wishlist.length > 0) {
       fetchPrices();
-      // Refresh prices every 30 seconds
       const interval = setInterval(fetchPrices, 30000);
       return () => clearInterval(interval);
     }
@@ -144,20 +161,33 @@ export default function WishlistPage() {
 
   const getMarketStatusBadge = (status: string) => {
     const badges = {
-      "pre-market": { text: "Pre-Market", color: "bg-blue-100 text-blue-700" },
-      regular: { text: "Market Open", color: "bg-green-100 text-green-700" },
+      "pre-market": {
+        text: "Pre-Market",
+        color:
+          "bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800",
+      },
+      regular: {
+        text: "Market Open",
+        color:
+          "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800",
+      },
       "after-hours": {
         text: "After Hours",
-        color: "bg-purple-100 text-purple-700",
+        color:
+          "bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800",
       },
-      closed: { text: "Market Closed", color: "bg-gray-100 text-gray-700" },
+      closed: {
+        text: "Closed",
+        color:
+          "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700",
+      },
     };
 
     const badge = badges[status as keyof typeof badges] || badges.closed;
 
     return (
       <span
-        className={`text-xs px-2 py-1 rounded-full font-medium ${badge.color}`}
+        className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${badge.color}`}
       >
         {badge.text}
       </span>
@@ -175,10 +205,10 @@ export default function WishlistPage() {
       text: `Are you sure you want to remove ${symbol} from your wishlist?`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "ลบแม่งเลย",
-      cancelButtonText: "เก็บไว้ก่อน ตัวนี้น่าสน",
-      confirmButtonColor: "#F93827",
-      cancelButtonColor: "#16C47F",
+      confirmButtonText: "Remove",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#EF4444",
+      cancelButtonColor: "#10B981",
     });
 
     if (!result.isConfirmed) return;
@@ -191,26 +221,12 @@ export default function WishlistPage() {
       const data = await response.json();
 
       if (data.success) {
-        Swal.fire({
-          title: `${symbol} removed from wishlist!`,
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500,
-        });
         fetchWishlist();
       } else {
-        Swal.fire({
-          title: "Failed to remove from wishlist",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
+        setError(data.error || "Failed to remove item");
       }
     } catch (err) {
-      Swal.fire({
-        title: "Failed to remove from wishlist",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      setError("Failed to remove item");
     }
   };
 
@@ -245,54 +261,52 @@ export default function WishlistPage() {
       setIsSaving(false);
     }
   };
+
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Wishlist ⭐
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Stocks you're interested in. Use the search bar above to add more
-              stocks.
+          <div className="mb-6 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🔖</span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+                Wishlist & Watchlist
+              </h1>
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Track stocks you&apos;re watching, set target prices, and add custom notes.
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+            <div className="mb-6 rounded-2xl border border-red-200 dark:border-red-800/80 bg-red-50 dark:bg-red-950/50 p-4 text-xs sm:text-sm font-semibold text-red-700 dark:text-red-300">
               {error}
             </div>
           )}
 
           {/* Loading State */}
           {isLoading && (
-            <div className="flex items-center justify-center h-100">
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <Loader2 className="w-6 h-6 animate-spin" />
-                <span>Loading wishlist...</span>
-              </div>
+            <div className="flex flex-col items-center justify-center py-20 gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+                Loading wishlist...
+              </span>
             </div>
           )}
 
           {/* Empty State */}
           {!isLoading && wishlist.length === 0 && (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center">
-              <div className="mb-4">
-                <span className="text-6xl">⭐</span>
+            <div className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-12 text-center shadow-sm">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-500 text-2xl mx-auto mb-4">
+                ⭐
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Your wishlist is empty
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-gray-100 mb-1">
+                Your Wishlist is Empty
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Use the search bar above to find and add stocks you're
-                interested in
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                💡 Tip: Search for a stock, then click "Add to Wishlist" from
-                the actions menu
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+                Use the search bar in the top navigation to search for any stock and click &ldquo;Add to Wishlist&rdquo;.
               </p>
             </div>
           )}
@@ -301,169 +315,171 @@ export default function WishlistPage() {
           {!isLoading && wishlist.length > 0 && (
             <>
               {/* Sort + View Toggle Controls */}
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400 mr-1">
-                  Sort by:
-                </span>
-                {(
-                  [
-                    { key: "symbol", label: "Symbol" },
-                    { key: "price", label: "Price" },
-                    { key: "change", label: "Change %" },
-                    { key: "date", label: "Date Added" },
-                  ] as const
-                ).map(({ key, label }) => (
-                  <button
-                    key={key}
-                    onClick={() => handleSort(key)}
-                    className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium border transition-all ${
-                      sortField === key
-                        ? "bg-blue-500 text-white border-blue-500 shadow-sm"
-                        : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-600"
-                    }`}
-                  >
-                    {label}
-                    {sortField === key && (
-                      <span className="text-xs">
-                        {sortDir === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </button>
-                ))}
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 p-2 bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-xs font-extrabold text-gray-500 dark:text-gray-400 px-2 uppercase tracking-wider">
+                    Sort:
+                  </span>
+                  {(
+                    [
+                      { key: "symbol", label: "Symbol" },
+                      { key: "price", label: "Price" },
+                      { key: "change", label: "Change %" },
+                      { key: "date", label: "Date Added" },
+                    ] as const
+                  ).map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => handleSort(key)}
+                      className={`flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-xl transition-all ${
+                        sortField === key
+                          ? "bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-md"
+                          : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                      }`}
+                    >
+                      <span>{label}</span>
+                      {sortField === key && (
+                        <span className="text-[10px]">
+                          {sortDir === "asc" ? "↑" : "↓"}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
 
                 {/* View Toggle */}
-                <div className="ml-auto flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
+                <div className="flex items-center gap-1 bg-white/80 dark:bg-gray-900/80 p-1 rounded-xl border border-gray-200/50 dark:border-gray-700/50">
                   <button
                     onClick={() => toggleView("card")}
                     title="Card view"
-                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
                       viewMode === "card"
-                        ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                        ? "bg-blue-500 text-white shadow-md"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                     }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3.5 w-3.5"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <rect x="3" y="3" width="8" height="8" rx="1.5" />
-                      <rect x="13" y="3" width="8" height="8" rx="1.5" />
-                      <rect x="3" y="13" width="8" height="8" rx="1.5" />
-                      <rect x="13" y="13" width="8" height="8" rx="1.5" />
-                    </svg>
-                    Cards
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                    <span>Cards</span>
                   </button>
                   <button
                     onClick={() => toggleView("table")}
                     title="Table view"
-                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
                       viewMode === "table"
-                        ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                        ? "bg-blue-500 text-white shadow-md"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                     }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3.5 w-3.5"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z" />
-                    </svg>
-                    Table
+                    <Table className="w-3.5 h-3.5" />
+                    <span>Table</span>
                   </button>
                 </div>
               </div>
 
               {/* ── Card View ── */}
               {viewMode === "card" && (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {sortedWishlist.map((item) => {
                     const priceData = prices.get(item.symbol);
+                    const isUp = (priceData?.change ?? 0) >= 0;
+
                     return (
                       <div
                         key={item._id}
-                        className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm hover:shadow-md transition-shadow"
+                        className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
                       >
-                        {priceData && (
-                          <div className="flex justify-end mb-2">
-                            {getMarketStatusBadge(priceData.marketStatus)}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-3 mb-4">
-                          <StockLogo symbol={item.symbol} size="lg" />
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                            {item.symbol}
-                          </h3>
-                        </div>
-                        {priceData ? (
-                          <div className="mb-4">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Current Price
-                            </p>
-                            <div className="flex items-baseline gap-2">
-                              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                ${priceData.price.toFixed(2)}
-                              </p>
-                              <p
-                                className={`text-sm font-semibold ${
-                                  priceData.change >= 0
-                                    ? "text-green-600"
-                                    : "text-red-600"
-                                }`}
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <StockLogo symbol={item.symbol} size="md" />
+                              <Link
+                                href={`/stocks/${item.symbol}`}
+                                className="font-extrabold text-gray-900 dark:text-gray-100 text-lg hover:text-blue-500 transition-colors"
                               >
-                                {priceData.change >= 0 ? "+" : ""}
-                                {priceData.change.toFixed(2)} (
-                                {priceData.changePercent.toFixed(2)}%)
-                              </p>
+                                {item.symbol}
+                              </Link>
                             </div>
+                            {priceData && (
+                              <div>{getMarketStatusBadge(priceData.marketStatus)}</div>
+                            )}
                           </div>
-                        ) : (
-                          <div className="mb-4">
-                            <p className="text-sm text-gray-400">
-                              Loading price...
-                            </p>
-                          </div>
-                        )}
-                        <div className="mb-4 text-xs text-gray-500 dark:text-gray-400">
-                          Added {new Date(item.addedAt).toLocaleDateString()}
+
+                          {/* Price */}
+                          {priceData ? (
+                            <div className="mb-4 bg-gray-50/50 dark:bg-gray-800/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-800">
+                              <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-0.5">
+                                Current Price
+                              </p>
+                              <div className="flex items-baseline justify-between">
+                                <span className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
+                                  ${priceData.price.toFixed(2)}
+                                </span>
+                                <span
+                                  className={`inline-flex items-center gap-1 text-xs font-bold ${
+                                    isUp
+                                      ? "text-emerald-600 dark:text-emerald-400"
+                                      : "text-red-600 dark:text-red-400"
+                                  }`}
+                                >
+                                  {isUp ? (
+                                    <TrendingUp className="w-3.5 h-3.5" />
+                                  ) : (
+                                    <TrendingDown className="w-3.5 h-3.5" />
+                                  )}
+                                  <span>
+                                    {isUp ? "+" : ""}
+                                    {priceData.change.toFixed(2)} (
+                                    {priceData.changePercent.toFixed(2)}%)
+                                  </span>
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="mb-4 py-3 text-center">
+                              <Loader2 className="w-4 h-4 animate-spin text-gray-400 mx-auto" />
+                            </div>
+                          )}
+
+                          {/* Target Price & Notes Badges */}
+                          {(item.notes || item.targetPrice) && (
+                            <div className="mb-4 p-3 rounded-2xl bg-blue-50/60 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-800/60 space-y-1 text-xs">
+                              {item.targetPrice && (
+                                <div className="flex items-center gap-1.5 font-bold text-blue-700 dark:text-blue-300">
+                                  <Target className="w-3.5 h-3.5 text-blue-500" />
+                                  <span>Target Price: ${item.targetPrice.toFixed(2)}</span>
+                                </div>
+                              )}
+                              {item.notes && (
+                                <div className="text-gray-600 dark:text-gray-300 italic">
+                                  &ldquo;{item.notes}&rdquo;
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        {(item.notes || item.targetPrice) && (
-                          <div className="mb-4 rounded bg-blue-50 dark:bg-gray-700 p-3 text-sm border border-blue-100 dark:border-gray-600">
-                            {item.targetPrice && (
-                              <div className="font-semibold text-blue-700 dark:text-blue-300 mb-1">
-                                🎯 Target: ${item.targetPrice.toFixed(2)}
-                              </div>
-                            )}
-                            {item.notes && (
-                              <div className="text-gray-700 dark:text-gray-300 italic">
-                                "{item.notes}"
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        <div className="flex gap-2">
+
+                        {/* Card Footer Actions */}
+                        <div className="pt-2 flex items-center gap-2 border-t border-gray-100 dark:border-gray-800">
                           <button
                             onClick={() => handleEditDetails(item)}
-                            className="rounded-md border border-gray-300 px-3 py-2 font-medium text-gray-700 hover:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex-none"
+                            className="p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"
                             title="Edit notes & target"
                           >
-                            ✏️
+                            <Edit3 className="w-4 h-4" />
                           </button>
                           <Link
                             href={`/stocks/${item.symbol}`}
-                            className="flex-1 rounded-md bg-blue-500 px-4 py-2 text-center font-medium text-white hover:bg-blue-700"
+                            className="flex-1 py-2 px-3 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs text-center shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-1"
                           >
-                            🔍 View Details
+                            <span>Details</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
                           </Link>
                           <button
                             onClick={() => handleRemove(item.symbol)}
-                            className="rounded-md border border-red-500 px-4 py-2 font-medium text-black-500 hover:bg-red-500 flex-none"
-                            title="Remove from wishlist"
+                            className="p-2.5 rounded-xl border border-red-200 dark:border-red-800/80 bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/80 transition-colors"
+                            title="Remove item"
                           >
-                            🗑️
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
@@ -474,119 +490,95 @@ export default function WishlistPage() {
 
               {/* ── Table View ── */}
               {viewMode === "table" && (
-                <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
-                  <table className="w-full text-sm">
-                    <thead className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <div className="overflow-x-auto rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-sm">
+                  <table className="w-full text-xs sm:text-sm border-collapse">
+                    <thead className="border-b border-gray-200/80 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 select-none">
                       <tr>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">
-                          Stock
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
-                          Price
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
-                          Change
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
-                          Target
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
-                          Change %
-                        </th>
-                        <th className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-gray-100">
-                          Status
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-gray-100">
-                          Added
-                        </th>
-                        <th className="px-4 py-3 text-center font-semibold text-gray-900 dark:text-gray-100">
-                          Actions
-                        </th>
+                        <th className="px-4 py-3.5 text-left font-bold">Stock</th>
+                        <th className="px-4 py-3.5 text-right font-bold">Price</th>
+                        <th className="px-4 py-3.5 text-right font-bold">Change</th>
+                        <th className="px-4 py-3.5 text-right font-bold">Change %</th>
+                        <th className="px-4 py-3.5 text-right font-bold">Target</th>
+                        <th className="px-4 py-3.5 text-center font-bold">Status</th>
+                        <th className="px-4 py-3.5 text-center font-bold">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                       {sortedWishlist.map((item) => {
                         const priceData = prices.get(item.symbol);
                         const isUp = (priceData?.change ?? 0) >= 0;
                         return (
                           <tr
                             key={item._id}
-                            className="border-b border-gray-100 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
+                            className="hover:bg-blue-50/50 dark:hover:bg-gray-800/80 transition-colors"
                           >
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
+                            <td className="px-4 py-3.5 font-extrabold text-gray-900 dark:text-gray-100">
+                              <div className="flex items-center gap-3">
                                 <StockLogo symbol={item.symbol} size="md" />
                                 <Link
                                   href={`/stocks/${item.symbol}`}
-                                  className="font-semibold text-gray-900 dark:text-gray-100 hover:text-blue-600"
+                                  className="hover:text-blue-500 transition-colors"
                                 >
                                   {item.symbol}
                                 </Link>
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-right font-medium text-gray-900 dark:text-gray-100">
+                            <td className="px-4 py-3.5 text-right font-bold text-gray-900 dark:text-gray-100">
                               {priceData ? (
                                 `$${priceData.price.toFixed(2)}`
                               ) : (
-                                <span className="text-gray-400 text-xs">
-                                  Loading…
-                                </span>
+                                <span className="text-gray-400 text-xs">Loading…</span>
                               )}
                             </td>
                             <td
-                              className={`px-4 py-3 text-right font-medium ${
-                                isUp ? "text-green-600" : "text-red-600"
+                              className={`px-4 py-3.5 text-right font-bold ${
+                                isUp
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-red-600 dark:text-red-400"
                               }`}
                             >
                               {priceData
-                                ? `${isUp ? "+" : ""}${priceData.change.toFixed(
-                                    2,
-                                  )}`
-                                : "—"}
-                            </td>
-                            <td className="px-4 py-3 text-right font-medium text-blue-600 dark:text-blue-400">
-                              {item.targetPrice
-                                ? `$${item.targetPrice.toFixed(2)}`
+                                ? `${isUp ? "+" : ""}${priceData.change.toFixed(2)}`
                                 : "—"}
                             </td>
                             <td
-                              className={`px-4 py-3 text-right font-medium ${
-                                isUp ? "text-green-600" : "text-red-600"
+                              className={`px-4 py-3.5 text-right font-extrabold ${
+                                isUp
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-red-600 dark:text-red-400"
                               }`}
                             >
                               {priceData
-                                ? `${
-                                    isUp ? "+" : ""
-                                  }${priceData.changePercent.toFixed(2)}%`
+                                ? `${isUp ? "+" : ""}${priceData.changePercent.toFixed(2)}%`
                                 : "—"}
                             </td>
-                            <td className="px-4 py-3 text-center">
-                              {priceData
-                                ? getMarketStatusBadge(priceData.marketStatus)
-                                : "—"}
+                            <td className="px-4 py-3.5 text-right font-bold text-blue-600 dark:text-blue-400">
+                              {item.targetPrice ? `$${item.targetPrice.toFixed(2)}` : "—"}
                             </td>
-                            <td className="px-4 py-3 text-right text-xs text-gray-500 dark:text-gray-400">
-                              {new Date(item.addedAt).toLocaleDateString()}
+                            <td className="px-4 py-3.5 text-center">
+                              {priceData ? getMarketStatusBadge(priceData.marketStatus) : "—"}
                             </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center justify-center gap-2">
+                            <td className="px-4 py-3.5">
+                              <div className="flex items-center justify-center gap-1.5">
                                 <button
                                   onClick={() => handleEditDetails(item)}
-                                  className="rounded border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-700 hover:text-white dark:border-gray-400 dark:text-gray-400 dark:hover:bg-white dark:hover:text-black"
+                                  className="p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                  title="Edit"
                                 >
-                                  Edit
+                                  <Edit3 className="w-3.5 h-3.5" />
                                 </button>
                                 <Link
                                   href={`/stocks/${item.symbol}`}
-                                  className="rounded bg-blue-500 px-2.5 py-1 text-xs font-medium text-white hover:bg-blue-700"
+                                  className="px-2.5 py-1 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold shadow-sm transition-all"
                                 >
                                   Details
                                 </Link>
                                 <button
                                   onClick={() => handleRemove(item.symbol)}
-                                  className="rounded border border-red-400 px-2.5 py-1 text-xs font-medium text-red-500 hover:bg-red-500 hover:text-white dark:border-red-600 dark:text-red-400 dark:hover:bg-red-600"
+                                  className="p-1.5 rounded-xl border border-red-200 dark:border-red-800/80 bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/80 transition-colors"
+                                  title="Remove"
                                 >
-                                  Remove
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </td>
@@ -599,63 +591,87 @@ export default function WishlistPage() {
               )}
             </>
           )}
+
+          {/* Edit Item Modal */}
+          {editingItem && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-all animate-in fade-in duration-150">
+              <div className="bg-white/95 dark:bg-gray-900/95 border border-gray-200/80 dark:border-gray-800 rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8 overflow-hidden">
+                <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100 dark:border-gray-800">
+                  <div className="flex items-center gap-3">
+                    <StockLogo symbol={editingItem.symbol} size="md" />
+                    <div>
+                      <h3 className="text-lg font-extrabold text-gray-900 dark:text-gray-100">
+                        Edit {editingItem.symbol}
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Update target price and private notes
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setEditingItem(null)}
+                    className="p-1.5 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
+                      <Target className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Target Price ($)</span>
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editTargetPrice}
+                      onChange={(e) => setEditTargetPrice(e.target.value)}
+                      placeholder="e.g. 150.00"
+                      className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="flex items-center gap-1.5 text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
+                      <FileText className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Personal Notes</span>
+                    </label>
+                    <textarea
+                      value={editNotes}
+                      onChange={(e) => setEditNotes(e.target.value)}
+                      placeholder="Add personal notes or strategy..."
+                      rows={3}
+                      className="w-full rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => setEditingItem(null)}
+                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveEdit}
+                    disabled={isSaving}
+                    className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-xs font-bold text-white shadow-md shadow-blue-500/20 disabled:opacity-50 transition-all"
+                  >
+                    {isSaving ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Save className="w-3.5 h-3.5" />
+                    )}
+                    <span>Save Changes</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Edit Modal */}
-      {editingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6 shadow-xl">
-            <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-              Edit {editingItem.symbol} Details
-            </h3>
-
-            <div className="mb-4">
-              <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Notes:
-              </label>
-              <textarea
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                rows={3}
-                placeholder="Add some notes..."
-                value={editNotes}
-                onChange={(e) => setEditNotes(e.target.value)}
-              />
-            </div>
-
-            <div className="mb-6">
-              <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Target Price ($):
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="e.g. 150.00"
-                value={editTargetPrice}
-                onChange={(e) => setEditTargetPrice(e.target.value)}
-              />
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setEditingItem(null)}
-                disabled={isSaving}
-                className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveEdit}
-                disabled={isSaving}
-                className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
-              >
-                {isSaving ? "Saving..." : "Save"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </ProtectedRoute>
   );
 }

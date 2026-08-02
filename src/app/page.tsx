@@ -4,7 +4,19 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import AuthModal from "@/components/AuthModal";
-import { Loader2 } from "lucide-react";
+import {
+  Loader2,
+  TrendingDown,
+  PieChart,
+  Bookmark,
+  BarChart3,
+  ArrowRight,
+  ExternalLink,
+  Quote as QuoteIcon,
+  Sparkles,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
 
 interface Quote {
   text: string;
@@ -92,11 +104,11 @@ export default function HomePage() {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [investorQuotes]);
+  }, []);
 
   useEffect(() => {
     setCurrentQuote(investorQuotes[currentIndex]);
-  }, [currentIndex, investorQuotes]);
+  }, [currentIndex]);
 
   // Fetch market news
   useEffect(() => {
@@ -110,7 +122,7 @@ export default function HomePage() {
       const data = await response.json();
 
       if (data.success && data.data) {
-        setMarketNews(data.data.slice(0, 6)); // Show top 6 news
+        setMarketNews(data.data.slice(0, 6));
       }
     } catch (err) {
       console.error("Error fetching market news:", err);
@@ -119,97 +131,139 @@ export default function HomePage() {
     }
   };
 
-  if (user) {
-    return null; // Will redirect
-  }
+  if (user) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-green-50 to-green-50 dark:from-red-900 dark:via-green-900 dark:to-green-900">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 overflow-hidden">
+      {/* Background Decorative Ambient Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-gradient-to-tr from-red-500/10 via-rose-500/10 to-emerald-500/15 dark:from-red-500/20 dark:via-rose-500/10 dark:to-emerald-500/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              📉 Doi Again
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-              If you happy in your whole day and you want to see something like
-              red color to make you down, you can use this app
-            </p>
+      <div className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/80 dark:border-gray-800 shadow-sm text-xs font-bold text-gray-700 dark:text-gray-300 mb-6">
+            <span className="text-base">📉</span>
+            <span>The Stock Portfolio Tracker</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          </div>
 
-            {/* CTA Buttons */}
-            <div className="flex gap-4 justify-center mb-12">
-              <button
-                onClick={() => {
-                  setAuthModalMode("signup");
-                  setShowAuthModal(true);
-                }}
-                className="rounded-lg bg-gradient-to-r from-red-500 to-green-500 px-8 py-4 text-lg font-semibold text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-              >
-                Get Started Free
-              </button>
-            </div>
+          {/* Main Title */}
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight leading-tight mb-6">
+            Doi Again{" "}
+            <span className="bg-gradient-to-r from-red-500 via-rose-500 to-emerald-500 bg-clip-text text-transparent">
+              Portfolio
+            </span>
+          </h1>
 
-            {/* Motivational Quote */}
-            <div
-              className="max-w-2xl mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer select-none hover:shadow-xl transition-shadow group"
-              onClick={() =>
-                setCurrentIndex((prev) =>
-                  prev === investorQuotes.length - 1 ? 0 : prev + 1,
-                )
-              }
-              title="Click for next quote"
+          {/* Subtitle */}
+          <p className="text-base sm:text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+            If you are happy all day and want to see some vibrant red color to
+            keep you humble, welcome home. Track positions, P/L, and watchlist
+            stocks in real-time.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-12">
+            <button
+              onClick={() => {
+                setAuthModalMode("signup");
+                setShowAuthModal(true);
+              }}
+              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-red-500 via-rose-500 to-emerald-500 hover:from-red-600 hover:to-emerald-600 px-7 py-3.5 text-sm sm:text-base font-bold text-white shadow-xl shadow-emerald-500/20 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
             >
-              <div className="text-2xl text-gray-800 dark:text-gray-200 italic mb-4">
-                "{currentQuote.text}"
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="text-gray-600 dark:text-gray-400 font-semibold">
-                  — {currentQuote.author}
-                </div>
-              </div>
+              <span>Get Started Free</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                setAuthModalMode("signin");
+                setShowAuthModal(true);
+              }}
+              className="flex items-center gap-2 rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/80 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 px-6 py-3.5 text-sm sm:text-base font-bold text-gray-800 dark:text-gray-200 shadow-sm transition-all active:scale-[0.98]"
+            >
+              <span>Sign In</span>
+            </button>
+          </div>
+
+          {/* Motivational Quote Card */}
+          <div
+            className="max-w-2xl mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl border border-gray-200/80 dark:border-gray-800 text-left cursor-pointer select-none hover:shadow-2xl transition-all group relative overflow-hidden"
+            onClick={() =>
+              setCurrentIndex((prev) =>
+                prev === investorQuotes.length - 1 ? 0 : prev + 1,
+              )
+            }
+            title="Click for next quote"
+          >
+            <QuoteIcon className="w-6 h-6 text-blue-500 opacity-40 mb-2 group-hover:scale-110 transition-transform" />
+            <p className="text-sm sm:text-lg text-gray-800 dark:text-gray-200 font-semibold italic mb-4 leading-relaxed">
+              &ldquo;{currentQuote.text}&rdquo;
+            </p>
+            <div className="flex items-center justify-between text-xs font-bold text-gray-500 dark:text-gray-400">
+              <span>— {currentQuote.author}</span>
+              <span className="text-[10px] text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                {currentIndex + 1} / {investorQuotes.length} · click next →
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-      <div className="bg-white dark:bg-gray-800 py-16">
+      <div className="py-16 sm:py-24 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-y border-gray-200/60 dark:border-gray-800">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
-            Features that help you manage your portfolio
-          </h2>
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+              Powerful Features for Smart Investors
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Everything you need to analyze, organize, and monitor your
+              investment assets.
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-red-50 to-green-50 dark:from-red-900 dark:to-green-900 border border-blue-200 dark:border-blue-800">
-              <div className="text-5xl mb-4">📊</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Portfolio Tracking
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Feature 1 */}
+            <div className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 shadow-sm hover:shadow-xl transition-all transform hover:scale-[1.01] group">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-800 text-blue-500 mb-4 group-hover:scale-110 transition-transform">
+                <PieChart className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-gray-100 mb-2">
+                Portfolio Dashboard & Groups
               </h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Monitor your investments with detailed profit/loss calculations
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Organize holdings into custom group tabs, track live unrealized
+                and realized P/L, and view interactive allocation donut charts.
               </p>
             </div>
 
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border border-green-200 dark:border-green-800">
-              <div className="text-5xl mb-4">⭐</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Wishlist
+            {/* Feature 2 */}
+            <div className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 shadow-sm hover:shadow-xl transition-all transform hover:scale-[1.01] group">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-100 dark:border-amber-800 text-amber-500 mb-4 group-hover:scale-110 transition-transform">
+                <Bookmark className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-gray-100 mb-2">
+                Wishlist & Target Prices
               </h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Track stocks you're interested for add to portfolio or just keep
-                an eye on them
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Save prospective stocks, set custom target entry prices, attach
+                personal investment notes, and receive market status updates.
               </p>
             </div>
 
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border border-green-200 dark:border-green-800">
-              <div className="text-5xl mb-4">📈</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Market Analysis
+            {/* Feature 3 */}
+            <div className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 shadow-sm hover:shadow-xl transition-all transform hover:scale-[1.01] group">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800 text-emerald-500 mb-4 group-hover:scale-110 transition-transform">
+                <BarChart3 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-gray-100 mb-2">
+                Live News & Market Insights
               </h3>
-              <p className="text-gray-700 dark:text-gray-300">
-                Get stock details, analyst recommendations, and news about the
-                stock
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                Stay updated with real-time stock news, analyst consensus
+                recommendations, financial metrics, and currency conversion ($ /
+                ฿).
               </p>
             </div>
           </div>
@@ -217,18 +271,23 @@ export default function HomePage() {
       </div>
 
       {/* Market News Section */}
-      <div className="bg-gray-50 dark:bg-gray-900 py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
-            Latest Market News 📰
-          </h2>
+      <div className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+              Latest Market News 📰
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Stay connected to real-time global financial headlines.
+            </p>
+          </div>
 
           {isLoadingNews ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <Loader2 className="w-6 h-6 animate-spin" />
-                <span>Loading news...</span>
-              </div>
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+                Loading market headlines...
+              </span>
             </div>
           ) : marketNews.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -238,25 +297,27 @@ export default function HomePage() {
                   href={news.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-700"
+                  className="group block bg-white/80 dark:bg-gray-900/80 rounded-3xl p-5 shadow-sm hover:shadow-xl transition-all border border-gray-200/80 dark:border-gray-800 backdrop-blur-xl transform hover:scale-[1.01]"
                 >
                   {news.image && (
-                    <img
-                      src={news.image}
-                      alt={news.headline}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
+                    <div className="w-full h-44 overflow-hidden rounded-2xl mb-4 bg-gray-100 dark:bg-gray-800">
+                      <img
+                        src={news.image}
+                        alt={news.headline}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
                   )}
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2">
+                  <h3 className="font-extrabold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 text-sm sm:text-base group-hover:text-blue-500 transition-colors">
                     {news.headline}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-3 leading-relaxed">
                     {news.summary}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-gray-400 dark:text-gray-500">
                     <span>{news.source}</span>
                     <span>
                       {new Date(news.datetime * 1000).toLocaleDateString()}
@@ -266,39 +327,52 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400">
-                No market news available at the moment
+            <div className="text-center py-12 bg-white/80 dark:bg-gray-900/80 rounded-3xl border border-gray-200/80 dark:border-gray-800">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                No market news available at the moment.
               </p>
             </div>
           )}
+
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => {
+                setAuthModalMode("signup");
+                setShowAuthModal(true);
+              }}
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 animate-bounce transition-colors"
+            >
+              <span>Join Doi Again to see full news & portfolio insights</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-        <p
-          className="mt-8 text-blue-500 text-center cursor-pointer hover:text-blue-700 text-lg font-semibold animate-bounce"
-          onClick={() => setShowAuthModal(true)}
-        >
-          Join with us to see more news
-        </p>
       </div>
 
       {/* Footer CTA */}
-      <div className="bg-gradient-to-r from-red-500 to-green-500 py-16">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            📉 Are you ready to see red color?
+      <div className="py-16 sm:py-20 bg-gradient-to-r from-red-600 via-rose-600 to-emerald-600 dark:from-red-950 dark:via-gray-900 dark:to-emerald-950 border-t border-white/10 relative overflow-hidden">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <img
+            src="/da.png"
+            alt="Doi Again Logo"
+            className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-6 object-contain rounded-2xl shadow-2xl border border-white/20 bg-white/10 backdrop-blur-md p-2"
+          />
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight">
+            Ready to embrace the red color?
           </h2>
-          <p className="text-xl text-white/90 mb-8">
-            Join with one of all investors who never see green color in his life
-            like me, with Doi Again
+          <p className="text-sm sm:text-lg text-white/90 mb-8 max-w-xl mx-auto leading-relaxed">
+            Join fellow investors who track their stock portfolio with total
+            clarity and humor on Doi Again.
           </p>
           <button
             onClick={() => {
               setAuthModalMode("signup");
               setShowAuthModal(true);
             }}
-            className="inline-block rounded-lg bg-white dark:bg-gray-800 px-8 py-4 text-lg font-semibold text-blue-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+            className="inline-flex items-center gap-2 rounded-2xl bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 text-sm sm:text-base font-extrabold shadow-2xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
           >
-            Create Free Account
+            <span>Create Free Account</span>
+            <ArrowRight className="w-4 h-4 text-gray-900" />
           </button>
         </div>
       </div>

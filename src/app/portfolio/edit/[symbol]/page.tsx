@@ -15,6 +15,7 @@ import StockLogo from "@/components/StockLogo";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { authFetch } from "@/lib/utils/auth-fetch";
 import Swal from "sweetalert2";
+import { ArrowLeft, Loader2, CheckCircle2, TrendingUp, TrendingDown, Info } from "lucide-react";
 
 export default function EditStockPage() {
   const router = useRouter();
@@ -40,7 +41,6 @@ export default function EditStockPage() {
       setIsLoading(true);
       setError("");
 
-      // Fetch from portfolio API to get enriched stock data with current price
       const portfolioResponse = await authFetch("/api/portfolio/stocks");
       const portfolioData: ApiResponse = await portfolioResponse.json();
 
@@ -48,17 +48,15 @@ export default function EditStockPage() {
         throw new Error("Failed to fetch portfolio data");
       }
 
-      // Find the specific stock from the portfolio
       const portfolioStocks = portfolioData.data?.stocks || [];
       const enrichedStock = portfolioStocks.find(
-        (s: any) => s.symbol === symbol,
+        (s: any) => s.symbol === symbol
       );
 
       if (!enrichedStock) {
         throw new Error("Stock not found in portfolio");
       }
 
-      // Set stock data (base portfolio stock)
       setStock({
         symbol: enrichedStock.symbol,
         units: enrichedStock.units,
@@ -68,7 +66,6 @@ export default function EditStockPage() {
         updatedAt: enrichedStock.updatedAt,
       });
 
-      // Set current price from the enriched data (already calculated by API)
       setCurrentPrice(enrichedStock.currentPrice);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch stock");
@@ -78,17 +75,16 @@ export default function EditStockPage() {
   };
 
   const handleSubmit = async (formData: FormData) => {
+    const isBuy = action === "BUY";
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `You are about to ${action.toLowerCase()} ${
-        formData.units
-      } units of ${symbol} at ${formData.price} each!`,
+      title: `${isBuy ? "Buy More" : "Sell"} ${symbol}?`,
+      text: `You are about to ${action.toLowerCase()} ${formData.units} shares of ${symbol} at $${formData.price} each!`,
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: `Yes, ${action.toLowerCase()} it!`,
+      confirmButtonText: `Yes, ${action.toLowerCase()} position`,
       cancelButtonText: "Cancel",
-      confirmButtonColor: "#16C47F",
-      cancelButtonColor: "#F93827",
+      confirmButtonColor: isBuy ? "#10B981" : "#EF4444",
+      cancelButtonColor: "#6B7280",
     });
 
     if (result.isConfirmed) {
@@ -115,22 +111,22 @@ export default function EditStockPage() {
             icon: "error",
             confirmButtonText: "OK",
           });
+          return;
         }
 
         if (action === "SELL" && !stock?.units) {
           setSuccessMessage(
-            "Stock completely sold and removed from portfolio!",
+            "Stock position completely sold and removed from portfolio!"
           );
         } else {
           setSuccessMessage(
-            `Successfully ${action.toLowerCase()}ed ${formData.units} units!`,
+            `Successfully ${action.toLowerCase()}ed ${formData.units} shares of ${symbol}!`
           );
         }
 
-        // Refresh and redirect after 2 seconds
         setTimeout(() => {
           router.push("/portfolio");
-        }, 2000);
+        }, 1500);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
         throw err;
@@ -143,12 +139,11 @@ export default function EditStockPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">
-              Loading stock details...
-            </p>
-          </div>
+        <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+            Loading position details...
+          </span>
         </div>
       </ProtectedRoute>
     );
@@ -157,16 +152,18 @@ export default function EditStockPage() {
   if (!stock) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl">
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-              {error || "Stock not found"}
+        <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-12 px-4 flex items-center justify-center">
+          <div className="w-full max-w-md text-center">
+            <div className="rounded-3xl border border-red-200 dark:border-red-800/80 bg-red-50 dark:bg-red-950/50 p-6 text-xs sm:text-sm font-semibold text-red-700 dark:text-red-300 shadow-sm mb-4">
+              {error || "Stock position not found in portfolio"}
             </div>
-            <div className="mt-4 text-center">
-              <Link href="/portfolio" className="text-blue-600 hover:underline">
-                Back to Portfolio
-              </Link>
-            </div>
+            <Link
+              href="/portfolio"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:underline"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Portfolio</span>
+            </Link>
           </div>
         </div>
       </ProtectedRoute>
@@ -175,146 +172,149 @@ export default function EditStockPage() {
 
   return (
     <ProtectedRoute>
-      <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl">
+      <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Buy/Sell {stock.symbol}
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Buy more or sell this stock
-            </p>
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <StockLogo symbol={stock.symbol} size="lg" />
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+                  Trade {stock.symbol}
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                  Execute buy or sell orders for your active holding.
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Stock Details Card */}
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  Current Data
-                </h2>
-                <StockLogo symbol={stock.symbol} size="lg" />
-              </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Stock Current Holding Card */}
+            <div className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <span className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider block mb-4">
+                  Current Position Summary
+                </span>
 
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Symbol:
-                  </span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {stock.symbol}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Shares:
-                  </span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {formatNumber(stock.units, 7)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Average Price:
-                  </span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {formatNumber(stock.avgPrice, 4)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Current Price:
-                  </span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {formatCurrency(currentPrice)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Total Cost:
-                  </span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {formatCurrency(stock.avgPrice * stock.units)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Current Value:
-                  </span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
-                    {formatCurrency(currentPrice * stock.units)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Realized P/L:
-                  </span>
-                  <span
-                    className={`font-semibold ${
-                      stock.realizedPnl >= 0 ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {formatCurrency(stock.realizedPnl)}
-                  </span>
+                <div className="space-y-3.5 text-xs sm:text-sm">
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">
+                      Symbol
+                    </span>
+                    <span className="font-extrabold text-gray-900 dark:text-gray-100">
+                      {stock.symbol}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">
+                      Shares Owned
+                    </span>
+                    <span className="font-extrabold text-gray-900 dark:text-gray-100">
+                      {formatNumber(stock.units, 7)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">
+                      Average Price
+                    </span>
+                    <span className="font-extrabold text-gray-900 dark:text-gray-100">
+                      ${formatNumber(stock.avgPrice, 4)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">
+                      Current Price
+                    </span>
+                    <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                      {formatCurrency(currentPrice)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">
+                      Total Capital Cost
+                    </span>
+                    <span className="font-extrabold text-gray-900 dark:text-gray-100">
+                      {formatCurrency(stock.avgPrice * stock.units)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-gray-800">
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">
+                      Current Value
+                    </span>
+                    <span className="font-extrabold text-gray-900 dark:text-gray-100">
+                      {formatCurrency(currentPrice * stock.units)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">
+                      Realized P/L
+                    </span>
+                    <span
+                      className={`font-extrabold ${
+                        stock.realizedPnl >= 0
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-red-600 dark:text-red-400"
+                      }`}
+                    >
+                      {formatCurrency(stock.realizedPnl)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Form Card */}
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
-              {/* Action Selector */}
+            <div className="rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 shadow-sm">
+              {/* Action Selector Pills */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Action
+                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                  Order Action
                 </label>
-                <div className="flex gap-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="BUY"
-                      checked={action === "BUY"}
-                      onChange={(e) =>
-                        setAction(e.target.value as "BUY" | "SELL")
-                      }
-                      disabled={isSubmitting}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Buy More
-                    </span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="SELL"
-                      checked={action === "SELL"}
-                      onChange={(e) =>
-                        setAction(e.target.value as "BUY" | "SELL")
-                      }
-                      disabled={isSubmitting}
-                      className="mr-2"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      Sell
-                    </span>
-                  </label>
+                <div className="flex p-1 bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-gray-200/60 dark:border-gray-700/60">
+                  <button
+                    type="button"
+                    onClick={() => setAction("BUY")}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+                      action === "BUY"
+                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                    }`}
+                  >
+                    <TrendingUp className="w-3.5 h-3.5" />
+                    <span>Buy More</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAction("SELL")}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+                      action === "SELL"
+                        ? "bg-red-500 text-white shadow-md shadow-red-500/20"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                    }`}
+                  >
+                    <TrendingDown className="w-3.5 h-3.5" />
+                    <span>Sell Position</span>
+                  </button>
                 </div>
               </div>
 
               {/* Success Message */}
               {successMessage && (
-                <div className="mb-4 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
-                  {successMessage}
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                    Redirecting to portfolio...
-                  </p>
+                <div className="mb-4 flex items-start gap-2.5 p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/80 text-xs sm:text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span>{successMessage}</span>
+                    <p className="text-[11px] font-normal text-emerald-600 dark:text-emerald-400 mt-0.5">
+                      Redirecting to portfolio...
+                    </p>
+                  </div>
                 </div>
               )}
 
               {/* Error Message */}
               {error && (
-                <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <div className="mb-4 p-3.5 rounded-2xl border border-red-200 dark:border-red-800/80 bg-red-50 dark:bg-red-950/50 text-xs sm:text-sm font-semibold text-red-700 dark:text-red-300">
                   {error}
                 </div>
               )}
@@ -325,22 +325,24 @@ export default function EditStockPage() {
                 isLoading={isSubmitting}
                 initialSymbol={stock.symbol}
                 readOnlySymbol
-                submitLabel={action === "BUY" ? "Buy" : "Sell"}
+                submitLabel={action === "BUY" ? "Execute Buy" : "Execute Sell"}
               >
                 {action === "SELL" && (
-                  <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700 mb-4">
-                    Maximum units available: {formatNumber(stock.units, 7)}
+                  <div className="flex items-center gap-2 rounded-2xl border border-blue-200 dark:border-blue-800/80 bg-blue-50/60 dark:bg-blue-950/40 p-3 text-xs font-semibold text-blue-700 dark:text-blue-300 mb-4">
+                    <Info className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>Available to sell: {formatNumber(stock.units, 7)} shares</span>
                   </div>
                 )}
               </StockForm>
 
               {/* Back Link */}
-              <div className="mt-4 text-center">
+              <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 text-center">
                 <Link
                   href="/portfolio"
-                  className="text-sm text-blue-600 hover:underline"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors"
                 >
-                  Back to Portfolio
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to Portfolio</span>
                 </Link>
               </div>
             </div>

@@ -8,6 +8,7 @@ import AuthModal from "@/components/AuthModal";
 import { authFetch } from "@/lib/utils/auth-fetch";
 import { useAuth } from "@/contexts/AuthContext";
 import Swal from "sweetalert2";
+import { Bookmark, Trash2, Briefcase, Plus, TrendingUp, TrendingDown, Loader2, Star } from "lucide-react";
 
 interface StockDetails {
   symbol: string;
@@ -258,42 +259,45 @@ export default function StockDetailPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
               <StockLogo symbol={symbol} size="lg" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
                   {symbol}
                 </h1>
                 {profile?.name && (
-                  <p className="mt-1 text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium mt-0.5">
                     {profile.name}
                   </p>
                 )}
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
               {/* Wishlist Button */}
               {checkingStatus ? (
                 <button
                   disabled
-                  className="rounded-md bg-gray-400 px-4 py-2 font-medium text-white cursor-not-allowed w-full sm:w-auto"
+                  className="rounded-2xl bg-gray-200 dark:bg-gray-800 px-4 py-2 text-xs font-bold text-gray-400 cursor-not-allowed flex items-center gap-1.5"
                 >
-                  Loading...
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Loading...</span>
                 </button>
               ) : isInWishlist ? (
                 <button
                   onClick={handleRemoveFromWishlist}
-                  className="rounded-md bg-red-500 px-4 py-2 font-medium text-white hover:bg-red-700 w-full sm:w-auto"
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800/80 px-4 py-2 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/80 transition-all shadow-sm active:scale-95"
                 >
-                  🗑️ Remove from Wishlist
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Remove Wishlist</span>
                 </button>
               ) : (
                 <button
                   onClick={handleAddToWishlist}
-                  className="rounded-md bg-blue-500 px-4 py-2 font-medium text-white hover:bg-blue-700 w-full sm:w-auto"
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-amber-500 hover:bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-amber-500/20 transition-all active:scale-95"
                 >
-                  ⭐ Add to Wishlist
+                  <Star className="w-3.5 h-3.5 fill-white" />
+                  <span>Add to Wishlist</span>
                 </button>
               )}
 
@@ -301,9 +305,10 @@ export default function StockDetailPage() {
               {isInPortfolio ? (
                 <Link
                   href={`/portfolio/edit/${symbol}`}
-                  className="rounded-md bg-green-500 px-4 py-2 font-medium text-white hover:bg-green-700 w-full sm:w-auto text-center"
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 px-4 py-2 text-xs font-bold text-white shadow-md shadow-emerald-500/20 transition-all active:scale-95"
                 >
-                  📊 Buy/Sell More
+                  <Briefcase className="w-3.5 h-3.5" />
+                  <span>Trade / Edit</span>
                 </Link>
               ) : (
                 <button
@@ -315,9 +320,10 @@ export default function StockDetailPage() {
                       router.push(`/portfolio/add?symbol=${symbol}`);
                     }
                   }}
-                  className="rounded-md bg-green-500 px-4 py-2 font-medium text-white hover:bg-green-700 w-full sm:w-auto"
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 px-4 py-2 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all active:scale-95"
                 >
-                  📊 Add to Portfolio
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add to Portfolio</span>
                 </button>
               )}
             </div>
@@ -325,28 +331,37 @@ export default function StockDetailPage() {
 
           {/* Current Price Card */}
           {quote && (
-            <div className="mb-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+            <div className="mb-6 rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-6 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Current Price
+                  <p className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                    Current Market Price
                   </p>
-                  <p className="text-4xl font-bold text-gray-900 dark:text-gray-100">
+                  <p className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
                     ${quote.c?.toFixed(2) || "N/A"}
                   </p>
                 </div>
                 <div className="sm:text-right">
-                  <p
-                    className={`text-2xl font-semibold ${
-                      quote.d >= 0 ? "text-green-600" : "text-red-600"
+                  <div
+                    className={`inline-flex items-center gap-1 text-lg sm:text-xl font-extrabold ${
+                      quote.d >= 0
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-red-600 dark:text-red-400"
                     }`}
                   >
-                    {quote.d >= 0 ? "+" : ""}
-                    {quote.d?.toFixed(2)} ({quote.dp?.toFixed(2)}%)
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Open: ${quote.o?.toFixed(2)} | High: ${quote.h?.toFixed(2)}{" "}
-                    | Low: ${quote.l?.toFixed(2)}
+                    {quote.d >= 0 ? (
+                      <TrendingUp className="w-5 h-5" />
+                    ) : (
+                      <TrendingDown className="w-5 h-5" />
+                    )}
+                    <span>
+                      {quote.d >= 0 ? "+" : ""}
+                      {quote.d?.toFixed(2)} ({quote.dp?.toFixed(2)}%)
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1">
+                    Open: ${quote.o?.toFixed(2)} &nbsp;|&nbsp; High: ${quote.h?.toFixed(2)}{" "}
+                    &nbsp;|&nbsp; Low: ${quote.l?.toFixed(2)}
                   </p>
                 </div>
               </div>

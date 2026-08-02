@@ -22,7 +22,7 @@ import {
 } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/utils/auth-fetch";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff, Plus, LayoutGrid, Table, Sparkles, Quote as QuoteIcon } from "lucide-react";
 
 interface Quote {
   text: string;
@@ -133,7 +133,7 @@ export default function PortfolioDashboard() {
         setTabs(
           hasAll
             ? saved
-            : [{ id: ALL_TAB_ID, name: "All Stocks", symbols: [] }, ...saved],
+            : [{ id: ALL_TAB_ID, name: "All Stocks", symbols: [] }, ...saved]
         );
       }
     } catch {
@@ -190,7 +190,7 @@ export default function PortfolioDashboard() {
     const currentVal = filteredStocks.reduce((s, st) => s + st.currentValue, 0);
     const unrealized = filteredStocks.reduce(
       (s, st) => s + st.unrealizedPnl,
-      0,
+      0
     );
     const realized = filteredStocks.reduce((s, st) => s + st.realizedPnl, 0);
     const net = unrealized + realized;
@@ -210,16 +210,16 @@ export default function PortfolioDashboard() {
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) =>
-        prev === investorQuotes.length - 1 ? 0 : prev + 1,
+        prev === investorQuotes.length - 1 ? 0 : prev + 1
       );
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [investorQuotes]);
+  }, []);
 
   useEffect(() => {
     setCurrentQuote(investorQuotes[currentIndex]);
-  }, [currentIndex, investorQuotes]);
+  }, [currentIndex]);
 
   const fetchExchangeRate = async () => {
     try {
@@ -231,7 +231,6 @@ export default function PortfolioDashboard() {
       }
     } catch (err) {
       console.error("Error fetching exchange rate:", err);
-      // Keep using fallback rate
     }
   };
 
@@ -262,152 +261,121 @@ export default function PortfolioDashboard() {
     }
   };
 
-  if (authLoading) {
-    // return (
-    //   <div className="flex items-center justify-center h-64">
-    //     <div className="flex items-center gap-3 text-muted-foreground">
-    //       <Loader2 className="w-6 h-6 animate-spin" />
-    //       <span>Loading...</span>
-    //     </div>
-    //   </div>
-    // );
-    return;
-  }
-
-  if (!user) {
-    return null; // Will redirect
-  }
+  if (authLoading) return null;
+  if (!user) return null;
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-              Portfolio 📊
-            </h1>
-            <p className="mt-1 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-              Welcome, {user.name}! 👋
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">📊</span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+                Portfolio Overview
+              </h1>
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Welcome back, <span className="font-bold text-gray-800 dark:text-gray-200">{user.name}</span>! 👋
             </p>
           </div>
 
-          <div className="flex justify-end flex-wrap items-center gap-2">
+          <div className="flex justify-end flex-wrap items-center gap-2.5">
             {/* Hide Numbers Toggle */}
             <button
               onClick={() => setHideNumbers(!hideNumbers)}
               title={hideNumbers ? "Show numbers" : "Hide numbers"}
-              className="flex items-center gap-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center gap-1.5 rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md px-3.5 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-sm transition-all active:scale-95"
             >
               {hideNumbers ? (
                 <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                  Show
+                  <Eye className="h-4 w-4 text-blue-500" />
+                  <span>Show</span>
                 </>
               ) : (
                 <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                    />
-                  </svg>
-                  Hide
+                  <EyeOff className="h-4 w-4 text-gray-400" />
+                  <span>Hide</span>
                 </>
               )}
             </button>
 
             {/* Currency Toggle */}
-            <div className="flex items-center bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-1">
+            <div className="flex items-center bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-2xl border border-gray-200/60 dark:border-gray-700/60 backdrop-blur-md shadow-inner">
               <button
                 onClick={() => setCurrency("USD")}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                className={`px-3 py-1 text-xs font-extrabold rounded-xl transition-all ${
                   currency === "USD"
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                    ? "bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-md"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                 }`}
               >
-                $
+                $ USD
               </button>
               <button
                 onClick={() => setCurrency("THB")}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                className={`px-3 py-1 text-xs font-extrabold rounded-xl transition-all ${
                   currency === "THB"
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                    ? "bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-md"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                 }`}
               >
-                ฿
+                ฿ THB
               </button>
             </div>
+
+            {/* Add Stock Button */}
             <Link
               href="/portfolio/add"
-              className="rounded-md bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 px-4 py-2 text-xs sm:text-sm font-bold text-white shadow-md shadow-blue-500/20 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
             >
-              + Add Stock
+              <Plus className="w-4 h-4" />
+              <span>Add Stock</span>
             </Link>
           </div>
         </div>
 
         {/* Motivational Quote */}
         <div
-          className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900 dark:to-purple-900 rounded-2xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800 cursor-pointer"
+          className="mb-8 relative overflow-hidden bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-emerald-500/10 dark:from-blue-500/20 dark:via-purple-500/20 dark:to-emerald-500/20 rounded-3xl p-5 sm:p-6 border border-blue-200/60 dark:border-blue-800/60 backdrop-blur-xl cursor-pointer select-none shadow-sm hover:shadow-md transition-all group"
           onClick={() =>
             setCurrentIndex((prev) =>
-              prev === investorQuotes.length - 1 ? 0 : prev + 1,
+              prev === investorQuotes.length - 1 ? 0 : prev + 1
             )
           }
           title="Click for next quote"
         >
-          <div className="text-sm sm:text-lg text-gray-800 dark:text-gray-200 italic mb-2 line-clamp-3 sm:line-clamp-none">
-            "{currentQuote.text}"
-          </div>
-          <div className="text-gray-600 dark:text-gray-400 font-semibold text-xs sm:text-sm">
-            — {currentQuote.author}
+          <div className="flex items-start gap-3">
+            <QuoteIcon className="w-5 h-5 text-blue-500 flex-shrink-0 mt-1 opacity-70 group-hover:scale-110 transition-transform" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-base font-semibold text-gray-800 dark:text-gray-200 italic mb-2 leading-relaxed">
+                &ldquo;{currentQuote.text}&rdquo;
+              </p>
+              <div className="flex items-center justify-between text-xs font-bold text-gray-500 dark:text-gray-400">
+                <span>— {currentQuote.author}</span>
+                <span className="text-[10px] text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {currentIndex + 1} / {investorQuotes.length} · click next →
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+          <div className="mb-6 rounded-2xl border border-red-200 dark:border-red-800/80 bg-red-50 dark:bg-red-950/50 p-4 text-xs sm:text-sm font-semibold text-red-700 dark:text-red-300 shadow-sm">
             {error}
           </div>
         )}
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex items-center justify-center h-18">
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Loader2 className="w-6 h-6 animate-spin" />
-              <span>Loading portfolio...</span>
-            </div>
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+              Fetching portfolio data...
+            </span>
           </div>
         )}
 
@@ -436,7 +404,7 @@ export default function PortfolioDashboard() {
 
             {/* Donut Charts */}
             {filteredStocks.length > 0 && (
-              <div className="mt-6">
+              <div className="mt-8">
                 <PortfolioDonutChart
                   stocks={filteredStocks}
                   hideNumbers={hideNumbers}
@@ -447,36 +415,26 @@ export default function PortfolioDashboard() {
             {/* View toggle + Portfolio Table */}
             <div className="mt-8">
               {/* Toggle bar */}
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {filteredStocks.length} stock
-                  {filteredStocks.length !== 1 ? "s" : ""}
-                </p>
-                <div className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Holding Assets ({filteredStocks.length})
+                </span>
+
+                <div className="flex items-center gap-1 bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-2xl border border-gray-200/60 dark:border-gray-700/60 backdrop-blur-md shadow-inner">
                   <button
                     onClick={() => {
                       setPortfolioView("card");
                       localStorage.setItem("portfolio-view", "card");
                     }}
                     title="Card view"
-                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                    className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
                       portfolioView === "card"
-                        ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                        ? "bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-md"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                     }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3.5 w-3.5"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <rect x="3" y="3" width="8" height="8" rx="1.5" />
-                      <rect x="13" y="3" width="8" height="8" rx="1.5" />
-                      <rect x="3" y="13" width="8" height="8" rx="1.5" />
-                      <rect x="13" y="13" width="8" height="8" rx="1.5" />
-                    </svg>
-                    Cards
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                    <span>Cards</span>
                   </button>
                   <button
                     onClick={() => {
@@ -484,24 +442,18 @@ export default function PortfolioDashboard() {
                       localStorage.setItem("portfolio-view", "table");
                     }}
                     title="Table view"
-                    className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all ${
+                    className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
                       portfolioView === "table"
-                        ? "bg-blue-500 text-white shadow-sm"
-                        : "text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                        ? "bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-md"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
                     }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3.5 w-3.5"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z" />
-                    </svg>
-                    Table
+                    <Table className="w-3.5 h-3.5" />
+                    <span>Table</span>
                   </button>
                 </div>
               </div>
+
               <PortfolioTable
                 stocks={filteredStocks}
                 currency={currency}

@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import Swal from "sweetalert2";
+import LogoutModal from "@/components/LogoutModal";
+import LoginSuccessModal from "@/components/LoginSuccessModal";
 
 interface User {
   id: string;
@@ -25,6 +26,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showLoginSuccessModal, setShowLoginSuccessModal] = useState(false);
   const router = useRouter();
 
   // Load user from localStorage on mount
@@ -46,17 +49,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password }),
     });
 
-    if (response.ok) {
-      Swal.fire({
-        title: "Are you ready to see your portfolio?",
-        imageUrl: "https://lede-admin.dailydot.com/wp-content/uploads/sites/69/2025/01/dog-closing-eyes-meme-1.png?w=1170&quality=75",
-        imageWidth: 391,
-        imageHeight: 277,
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    }
-
     const data = await response.json();
 
     if (!data.success) {
@@ -70,7 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(data.data.token);
     setUser(data.data.user);
 
-    // Redirect to portfolio
+    // Show modern login success modal
+    setShowLoginSuccessModal(true);
+  };
+
+  const handleLoginSuccessClose = () => {
+    setShowLoginSuccessModal(false);
     router.push("/portfolio");
   };
 
@@ -98,44 +95,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/portfolio");
   };
 
-  const signOut = async () => {
-    const result = await Swal.fire({
-      title: "Are you sure you want to sign out?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, i can't be here anymore!",
-      cancelButtonText: "No, i love red color!",
-      confirmButtonColor: "#F93827",
-      cancelButtonColor: "#16C47F",
-    });
+  const signOut = () => {
+    setShowLogoutModal(true);
+  };
 
-    if (result.isConfirmed) {
-      Swal.fire({
-        title: "Signed out successfully!",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      setToken(null);
-      setUser(null);
-      router.push("/");
-    } else {
-      Swal.fire({
-        title: "You really love red color!",
-        imageUrl: "https://www.entrepreneur.com/wp-content/uploads/sites/2/2018/07/20180703190744-rollsafe-meme.jpeg?resize=800,450",
-        imageWidth: 400,
-        imageHeight: 225,
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    }
+  const handleConfirmSignOut = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setToken(null);
+    setUser(null);
+    setShowLogoutModal(false);
+    router.push("/");
   };
 
   return (
     <AuthContext.Provider value={{ user, token, isLoading, signIn, signUp, signOut }}>
       {children}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleConfirmSignOut}
+      />
+      <LoginSuccessModal
+        isOpen={showLoginSuccessModal}
+        onClose={handleLoginSuccessClose}
+      />
     </AuthContext.Provider>
   );
 }

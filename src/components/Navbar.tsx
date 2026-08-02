@@ -8,7 +8,18 @@ import StockLogo from "./StockLogo";
 import AuthModal from "./AuthModal";
 import { authFetch } from "@/lib/utils/auth-fetch";
 import Swal from "sweetalert2";
-import { Menu, X } from "lucide-react";
+import {
+  Menu,
+  X,
+  Search,
+  LogOut,
+  User as UserIcon,
+  Briefcase,
+  Bookmark,
+  History,
+  Newspaper,
+  Loader2,
+} from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface StockSuggestion {
@@ -86,73 +97,6 @@ export default function Navbar() {
     };
   }, [searchQuery]);
 
-  const handleAddToPortfolio = (symbol: string) => {
-    if (!user) {
-      setAuthModalMode("signin");
-      setShowAuthModal(true);
-      return;
-    }
-    setSearchQuery("");
-    setSuggestions([]);
-    setShowSuggestions(false);
-    router.push(`/portfolio/add?symbol=${symbol}`);
-  };
-
-  const handleAddToWishlist = async (symbol: string) => {
-    if (!user) {
-      setAuthModalMode("signin");
-      setShowAuthModal(true);
-      return;
-    }
-
-    try {
-      const response = await authFetch("/api/wishlist", {
-        method: "POST",
-        body: JSON.stringify({ symbol }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        Swal.fire({
-          title: `${symbol} added to wishlist!`,
-          icon: "success",
-          draggable: true,
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          if (pathname === "/wishlist") {
-            window.location.reload();
-          }
-        });
-        setSearchQuery("");
-        setSuggestions([]);
-        setShowSuggestions(false);
-      } else {
-        Swal.fire({
-          title: "Failed to add to wishlist",
-          text: data.error,
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-      }
-    } catch (err) {
-      Swal.fire({
-        title: "Failed to add to wishlist",
-        text: err instanceof Error ? err.message : "An error occurred",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    }
-  };
-
-  const handleViewDetails = (symbol: string) => {
-    setSearchQuery("");
-    setSuggestions([]);
-    setShowSuggestions(false);
-    router.push(`/stocks/${symbol}`);
-  };
-
   const handleRowClick = (symbol: string, e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.closest("a")) {
@@ -164,111 +108,113 @@ export default function Navbar() {
     router.push(`/stocks/${symbol}`);
   };
 
-  // Show navbar on all pages now (no signin/signup pages to hide it on)
+  const navLinks = [
+    {
+      href: "/portfolio",
+      label: "Portfolio",
+      icon: Briefcase,
+      match: pathname === "/portfolio",
+    },
+    {
+      href: "/wishlist",
+      label: "Wishlist",
+      icon: Bookmark,
+      match: pathname?.startsWith("/wishlist"),
+    },
+    {
+      href: "/transaction",
+      label: "Transaction",
+      icon: History,
+      match: pathname === "/transaction",
+    },
+    {
+      href: "/news",
+      label: "News",
+      icon: Newspaper,
+      match: pathname === "/news",
+    },
+  ];
+
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-to-r from-red-500 to-green-500 shadow-lg">
+    <nav className="sticky top-0 z-50 backdrop-blur-xl bg-gradient-to-r from-red-600/95 via-rose-600/95 to-emerald-600/95 dark:from-gray-950/95 dark:via-gray-900/95 dark:to-gray-950/95 border-b border-white/10 dark:border-gray-800/80 shadow-md transition-all">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6 sm:gap-8">
             <Link
               href={user ? "/portfolio" : "/"}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2.5 group transition-transform duration-200 hover:scale-[1.02]"
             >
-              <div className="text-2xl font-bold text-white">📉</div>
-              <span className="text-xl font-bold text-white hidden sm:block">
+              <img
+                src="/da.png"
+                alt="Doi Again Logo"
+                className="h-9 w-9 object-contain rounded-xl shadow-md border border-white/20 bg-white/10 backdrop-blur-md group-hover:rotate-6 transition-transform"
+              />
+              <span className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
                 Doi Again
               </span>
             </Link>
 
             {/* Navigation Links - Only for authenticated users */}
             {user && (
-              <div className="hidden md:flex items-center gap-4">
-                <Link
-                  href="/portfolio"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === "/portfolio"
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  Portfolio 💼
-                </Link>
-                <Link
-                  href="/wishlist"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname?.startsWith("/wishlist")
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  Wishlist 🔖
-                </Link>
-                <Link
-                  href="/transaction"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === "portfolio/transaction"
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  Transaction 📜
-                </Link>
-                <Link
-                  href="/news"
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === "/news"
-                      ? "bg-white/20 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  News 📰
-                </Link>
+              <div className="hidden md:flex items-center gap-1.5 p-1 rounded-2xl bg-black/10 dark:bg-white/5 backdrop-blur-md border border-white/10">
+                {navLinks.map(({ href, label, icon: Icon, match }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                      match
+                        ? "bg-white text-gray-900 shadow-md dark:bg-gray-800 dark:text-white"
+                        : "text-white/80 hover:text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{label}</span>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
 
           {/* Search Bar */}
           <div
-            className="flex-1 min-w-0 max-w-xs sm:max-w-md mx-2 sm:mx-4"
+            className="flex-1 min-w-0 max-w-xs sm:max-w-md mx-2"
             ref={searchRef}
           >
             <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-white/60 dark:text-gray-400">
+                <Search className="w-4 h-4" />
+              </div>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
                 placeholder="Search stocks..."
-                className="w-full rounded-lg bg-white/90 dark:bg-gray-800/90 px-4 py-2 pr-10 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:bg-white dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-white/50"
+                className="w-full rounded-2xl bg-white/20 dark:bg-gray-800/80 backdrop-blur-md pl-10 pr-10 py-2 text-xs sm:text-sm text-white dark:text-gray-100 placeholder-white/60 dark:placeholder-gray-400 border border-white/20 dark:border-gray-700/80 focus:bg-white focus:text-gray-900 focus:placeholder-gray-400 dark:focus:bg-gray-800 dark:focus:text-gray-100 focus:outline-none focus:ring-2 focus:ring-white/40 shadow-inner transition-all"
                 autoComplete="off"
               />
               {isSearching && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
+                  <Loader2 className="h-4 w-4 animate-spin text-white/80 dark:text-gray-400" />
                 </div>
               )}
 
               {/* Search Suggestions Dropdown */}
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl max-h-96 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl border border-gray-200/80 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl max-h-96 overflow-y-auto z-50 divide-y divide-gray-100 dark:divide-gray-800 animate-in fade-in duration-150">
                   {suggestions.map((suggestion) => (
                     <div
                       key={suggestion.symbol}
-                      className="relative border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                      onClick={(e) => handleRowClick(suggestion.symbol, e)}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50/50 dark:hover:bg-gray-800/80 cursor-pointer transition-colors"
                     >
-                      <div className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer">
-                        <StockLogo symbol={suggestion.symbol} size="md" />
-                        <div
-                          className="flex-1 min-w-0"
-                          onClick={(e) => handleRowClick(suggestion.symbol, e)}
-                          title={suggestion.name}
-                        >
-                          <div className="font-semibold text-gray-900 dark:text-gray-100">
-                            {suggestion.symbol}
-                          </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                            {suggestion.name}
-                          </div>
+                      <StockLogo symbol={suggestion.symbol} size="md" />
+                      <div className="flex-1 min-w-0" title={suggestion.name}>
+                        <div className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+                          {suggestion.symbol}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {suggestion.name}
                         </div>
                       </div>
                     </div>
@@ -278,108 +224,82 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* User Menu or Auth Buttons */}
-          <div className="flex items-center gap-4">
-            {user ? (
-              <div className="flex items-center gap-4">
-                <span className="hidden sm:block text-sm text-white/90">
-                  {user.name}
-                </span>
+          {/* User Controls & Theme Toggle */}
+          <div className="flex items-center gap-3">
+            {user && (
+              <div className="flex items-center gap-3">
+                {/* <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 dark:bg-white/5 border border-white/10 text-white text-xs font-semibold">
+                  <UserIcon className="w-3.5 h-3.5 text-white/80" />
+                  <span className="truncate max-w-[120px]">{user.name}</span>
+                </div> */}
                 <button
                   onClick={signOut}
-                  className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors"
+                  className="flex items-center gap-1.5 rounded-xl bg-white/15 hover:bg-red-500/80 dark:bg-white/10 dark:hover:bg-red-500/80 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-white transition-all shadow-sm active:scale-95"
                 >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    setAuthModalMode("signin");
-                    setShowAuthModal(true);
-                  }}
-                  className="rounded-md bg-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/30 transition-colors"
-                >
-                  Sign In
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Sign Out</span>
                 </button>
               </div>
             )}
-            <div className="bg-white/10 rounded-lg">
+
+            <div className="rounded-xl p-1 bg-white/10 dark:bg-white/5 border border-white/10">
               <ThemeToggle />
             </div>
-          </div>
 
-          {/*Mobile menu*/}
-          <div className="md:hidden">
+            {/* Mobile Menu Button */}
             {user && (
-              <button
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="rounded-md p-2 text-white hover:bg-white/20 transition-colors"
-              >
-                {showMobileMenu ? (
-                  <X className="h-6 w-6 gap-4" />
-                ) : (
-                  <Menu className="h-6 w-6 gap-4" />
-                )}
-              </button>
-            )}
-            {/* Mobile dropdown — renders below navbar */}
-            {user && showMobileMenu && (
-              <div className="fixed top-16 left-0 right-0 z-50 border-t border-white/20 bg-white dark:bg-gray-800 shadow-xl">
-                <div className="flex flex-col p-3">
-                  {[
-                    {
-                      href: "/portfolio",
-                      label: "Portfolio 💼",
-                      match: pathname === "/portfolio",
-                    },
-                    {
-                      href: "/wishlist",
-                      label: "Wishlist 🔖",
-                      match: pathname?.startsWith("/wishlist"),
-                    },
-                    {
-                      href: "/transaction",
-                      label: "Transaction 📜",
-                      match: pathname === "/transaction",
-                    },
-                    {
-                      href: "/news",
-                      label: "News 📰",
-                      match: pathname === "/news",
-                    },
-                  ].map(({ href, label, match }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => setShowMobileMenu(false)}
-                      className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                        match
-                          ? "bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400"
-                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      {label}
-                    </Link>
-                  ))}
-                  <div className="border-t border-gray-100 dark:border-gray-700 mt-2 pt-2">
-                    <button
-                      onClick={() => {
-                        signOut();
-                        setShowMobileMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                </div>
+              <div className="md:hidden">
+                <button
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                  className="rounded-xl p-2 text-white hover:bg-white/20 transition-colors"
+                  aria-label="Toggle Menu"
+                >
+                  {showMobileMenu ? (
+                    <X className="h-5 w-5" />
+                  ) : (
+                    <Menu className="h-5 w-5" />
+                  )}
+                </button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Mobile Drawer */}
+      {user && showMobileMenu && (
+        <div className="md:hidden border-t border-white/10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl animate-in slide-in-from-top-2 duration-200">
+          <div className="flex flex-col p-3 space-y-1">
+            {navLinks.map(({ href, label, icon: Icon, match }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setShowMobileMenu(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
+                  match
+                    ? "bg-blue-500 text-white shadow-md shadow-blue-500/20"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+              </Link>
+            ))}
+            <div className="border-t border-gray-100 dark:border-gray-800 mt-2 pt-2">
+              <button
+                onClick={() => {
+                  signOut();
+                  setShowMobileMenu(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Auth Modal */}
       <AuthModal
