@@ -150,7 +150,7 @@ export default function Navbar() {
                 alt="Doi Again Logo"
                 className="h-9 w-9 object-contain rounded-xl shadow-md border border-white/20 bg-white/10 backdrop-blur-md group-hover:rotate-6 transition-transform"
               />
-              <span className="text-lg sm:text-xl font-extrabold text-white tracking-tight">
+              <span className="text-md sm:text-xl font-extrabold text-white tracking-tight">
                 Doi Again
               </span>
             </Link>
@@ -227,17 +227,13 @@ export default function Navbar() {
           {/* User Controls & Theme Toggle */}
           <div className="flex items-center gap-3">
             {user && (
-              <div className="flex items-center gap-3">
-                {/* <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 dark:bg-white/5 border border-white/10 text-white text-xs font-semibold">
-                  <UserIcon className="w-3.5 h-3.5 text-white/80" />
-                  <span className="truncate max-w-[120px]">{user.name}</span>
-                </div> */}
+              <div className="hidden sm:flex items-center gap-3">
                 <button
                   onClick={signOut}
                   className="flex items-center gap-1.5 rounded-xl bg-white/15 hover:bg-red-500/80 dark:bg-white/10 dark:hover:bg-red-500/80 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-white transition-all shadow-sm active:scale-95"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Sign Out</span>
+                  <span>Sign Out</span>
                 </button>
               </div>
             )}
