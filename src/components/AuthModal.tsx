@@ -384,7 +384,7 @@ export default function AuthModal({
                   required
                   autoComplete="email"
                   className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 pl-9 pr-3 py-2 text-xs font-semibold text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                  placeholder="name@example.com"
+                  placeholder="nanthakorn@example.com"
                 />
               </div>
             </div>

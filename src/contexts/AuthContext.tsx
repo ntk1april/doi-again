@@ -9,6 +9,7 @@ interface User {
   id: string;
   email: string;
   name: string;
+  darkMode?: boolean;
 }
 
 interface AuthContextType {
@@ -18,6 +19,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signOut: () => void;
+  updateUserDarkMode: (darkMode: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,6 +43,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setIsLoading(false);
   }, []);
+
+  const updateUserDarkMode = (darkMode: boolean) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated = { ...prev, darkMode };
+      localStorage.setItem("user", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const signIn = async (email: string, password: string) => {
     const response = await fetch("/api/auth/signin", {
@@ -109,7 +120,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isLoading,
+        signIn,
+        signUp,
+        signOut,
+        updateUserDarkMode,
+      }}
+    >
       {children}
       <LogoutModal
         isOpen={showLogoutModal}

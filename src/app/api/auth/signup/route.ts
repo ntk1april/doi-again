@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
             id: user._id.toString(),
             email: user.email,
             name: user.name,
+            darkMode: Boolean(user.darkMode),
           },
         },
       },
