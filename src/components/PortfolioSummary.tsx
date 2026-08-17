@@ -5,7 +5,14 @@
 
 import { PortfolioSummary as PortfolioSummaryType } from "@/types";
 import { formatCurrency, formatPercent } from "@/lib/utils/calculations";
-import { Wallet, CircleDollarSign, TrendingUp, TrendingDown, Award, AlertOctagon } from "lucide-react";
+import {
+  Wallet,
+  CircleDollarSign,
+  TrendingUp,
+  TrendingDown,
+  Award,
+  AlertOctagon,
+} from "lucide-react";
 
 const HIDDEN = "••••••";
 
@@ -44,7 +51,7 @@ export default function PortfolioSummary({
       ? stocks.reduce(
           (max, stock) =>
             stock.netPnlPercent > max.netPnlPercent ? stock : max,
-          stocks[0]
+          stocks[0],
         )
       : null;
 
@@ -53,7 +60,7 @@ export default function PortfolioSummary({
       ? stocks.reduce(
           (min, stock) =>
             stock.netPnlPercent < min.netPnlPercent ? stock : min,
-          stocks[0]
+          stocks[0],
         )
       : null;
 
@@ -89,6 +96,67 @@ export default function PortfolioSummary({
         </p>
       </div>
 
+      {/* Top Gainer */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 shadow-sm hover:shadow-md transition-all group">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Top Gainer
+          </span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 shadow-inner group-hover:scale-110 transition-transform">
+            <Award className="w-4 h-4" />
+          </div>
+        </div>
+        {topGainer ? (
+          <>
+            <p className="text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">
+              {topGainer.symbol}
+            </p>
+            <div className="flex items-center gap-1.5 mt-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+              <span>{formatPercent(topGainer.netPnlPercent)}</span>
+              <span>
+                (
+                {mask(formatCurrency(convertValue(topGainer.netPnl), currency))}
+                )
+              </span>
+            </div>
+          </>
+        ) : (
+          <p className="mt-2 text-xs font-semibold text-gray-400 dark:text-gray-500">
+            No data
+          </p>
+        )}
+      </div>
+
+      {/* Top Loser */}
+      <div className="relative overflow-hidden rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 shadow-sm hover:shadow-md transition-all group col-span-2 sm:col-span-1">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            Top Loser
+          </span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-950/60 border border-red-100 dark:border-red-800/60 text-red-600 dark:text-red-400 shadow-inner group-hover:scale-110 transition-transform">
+            <AlertOctagon className="w-4 h-4" />
+          </div>
+        </div>
+        {topLoser ? (
+          <>
+            <p className="text-xl sm:text-2xl font-extrabold text-red-600 dark:text-red-400 tracking-tight">
+              {topLoser.symbol}
+            </p>
+            <div className="flex items-center gap-1.5 mt-1 text-xs font-bold text-red-600 dark:text-red-400">
+              <span>{formatPercent(topLoser.netPnlPercent)}</span>
+              <span>
+                ({mask(formatCurrency(convertValue(topLoser.netPnl), currency))}
+                )
+              </span>
+            </div>
+          </>
+        ) : (
+          <p className="mt-2 text-xs font-semibold text-gray-400 dark:text-gray-500">
+            No data
+          </p>
+        )}
+      </div>
+
       {/* Net P/L */}
       <div className="relative overflow-hidden rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 shadow-sm hover:shadow-md transition-all group">
         <div className="flex items-center justify-between mb-3">
@@ -111,72 +179,22 @@ export default function PortfolioSummary({
         </div>
         <p
           className={`text-xl sm:text-2xl font-extrabold tracking-tight ${
-            isProfit ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+            isProfit
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-red-600 dark:text-red-400"
           }`}
         >
           {formatPercent(summary.netPnlPercent)}
         </p>
         <p
           className={`mt-1 text-xs font-bold ${
-            isProfit ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+            isProfit
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-red-600 dark:text-red-400"
           }`}
         >
           {mask(formatCurrency(convertValue(summary.netPnl), currency))}
         </p>
-      </div>
-
-      {/* Top Gainer */}
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 shadow-sm hover:shadow-md transition-all group">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Top Gainer
-          </span>
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/60 text-emerald-600 dark:text-emerald-400 shadow-inner group-hover:scale-110 transition-transform">
-            <Award className="w-4 h-4" />
-          </div>
-        </div>
-        {topGainer ? (
-          <>
-            <p className="text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight">
-              {topGainer.symbol}
-            </p>
-            <div className="flex items-center gap-1.5 mt-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-              <span>{formatPercent(topGainer.netPnlPercent)}</span>
-              <span>
-                ({mask(formatCurrency(convertValue(topGainer.netPnl), currency))})
-              </span>
-            </div>
-          </>
-        ) : (
-          <p className="mt-2 text-xs font-semibold text-gray-400 dark:text-gray-500">No data</p>
-        )}
-      </div>
-
-      {/* Top Loser */}
-      <div className="relative overflow-hidden rounded-3xl border border-gray-200/80 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl p-5 shadow-sm hover:shadow-md transition-all group col-span-2 sm:col-span-1">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Top Loser
-          </span>
-          <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-950/60 border border-red-100 dark:border-red-800/60 text-red-600 dark:text-red-400 shadow-inner group-hover:scale-110 transition-transform">
-            <AlertOctagon className="w-4 h-4" />
-          </div>
-        </div>
-        {topLoser ? (
-          <>
-            <p className="text-xl sm:text-2xl font-extrabold text-red-600 dark:text-red-400 tracking-tight">
-              {topLoser.symbol}
-            </p>
-            <div className="flex items-center gap-1.5 mt-1 text-xs font-bold text-red-600 dark:text-red-400">
-              <span>{formatPercent(topLoser.netPnlPercent)}</span>
-              <span>
-                ({mask(formatCurrency(convertValue(topLoser.netPnl), currency))})
-              </span>
-            </div>
-          </>
-        ) : (
-          <p className="mt-2 text-xs font-semibold text-gray-400 dark:text-gray-500">No data</p>
-        )}
       </div>
     </div>
   );
