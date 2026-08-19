@@ -10,7 +10,7 @@ Go to [Doi Again - Stock Portfolio Tracker](https://doi-again.vercel.app/) → L
 
 ### 📊 Portfolio Management
 
-- **Stock Prices** - Integration with Finnhub API
+- **Stock Prices** - Integration with Webull Custom API (Primary), Finnhub, and Alpha Vantage
 - **Profit/Loss Tracking** - Automatic calculation of realized and unrealized P/L
 - **Portfolio Summary** - Overview of total investment, current value, and net P/L
 - **Stock Logos** - Visual identification with automatic 2-letter fallback
@@ -42,6 +42,7 @@ Go to [Doi Again - Stock Portfolio Tracker](https://doi-again.vercel.app/) → L
 ### 🔍 Stock Details & Search
 
 - **Comprehensive Analysis** - Company info, metrics, recommendations
+- **Simple Charts** - Real-time Candlestick, Heikin Ashi, and Line charts with live Pre/Post market pricing powered by Webull
 - **Analyst Ratings** - Buy/Hold/Sell recommendations
 - **News Sentiment** - Market sentiment analysis
 - **Global Search** - Search any stock from navbar
@@ -102,30 +103,46 @@ Go to [Doi Again - Stock Portfolio Tracker](https://doi-again.vercel.app/) → L
    # JWT Secret (REQUIRED - Change this!)
    JWT_SECRET=your-super-secret-jwt-key-min-32-characters-long
 
-   # Stock Data APIs (At least one recommended)
+   # Stock Data APIs (At least one recommended in each category)
+   # Webull API (Primary for live data & charts)
+   WEBULL_API_URL=your-webull-api-url
+   WEBULL_API_KEY=your-webull-api-key
+
+   # Finnhub (Fallback API for prices, news, and charts)
    FINNHUB_API_KEY=your_finnhub_api_key_here
+
+   # Alpha Vantage (Secondary Fallback API)
    ALPHAVANTAGE_API_KEY=your_alphavantage_api_key_here
+
+   # Cron (if u want to use automatic clearing transactions)
+   CRON_SECRET=your-cron-secret
+
+   # Email (for OTP password reset)
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USER=your-email-address
+   EMAIL_PASS=your-email-password (get from app password in google account security settings)
    ```
 
 4. **Get API Keys (Optional)**
 
-   **Finnhub (Recommended - Primary API):**
+**Webull Custom Proxy (Recommended - Primary API for all live data & charts):**\n\n - You must deploy your own Webull Proxy API.\n - Highly reliable with real-time Pre/Post Market hours.\n\n **Finnhub (Fallback API):**
 
-   - Visit: https://finnhub.io/register
-   - Free tier: 60 calls/minute
-   - Fast and reliable
+- Visit: https://finnhub.io/register
+- Free tier: 60 calls/minute
+- Fast and reliable
 
-   **Alpha Vantage (Fallback API):**
+**Alpha Vantage (Secondary Fallback API):**
 
-   - Visit: https://www.alphavantage.co/support/#api-key
-   - Free tier: 5 calls/minute, 500/day
-   - Automatic fallback if Finnhub fails
+- Visit: https://www.alphavantage.co/support/#api-key
+- Free tier: 5 calls/minute, 500/day
+- Automatic fallback if Finnhub fails
 
 5. **Run the development server**
 
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
 6. **Open your browser**
 

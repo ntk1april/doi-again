@@ -9,7 +9,7 @@ import {
   calculateTotalCost,
   calculateNetPnl,
 } from "@/lib/utils/calculations";
-import { getRealStockPrice } from "@/lib/utils/realPrices";
+import { getRealStockPrice } from "@/lib/utils/stockPrice";
 import { getStockLogo } from "@/lib/utils/logos";
 import {
   PortfolioStock as PortfolioStockType,

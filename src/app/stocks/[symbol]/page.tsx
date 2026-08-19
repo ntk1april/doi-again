@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import StockLogo from "@/components/StockLogo";
@@ -8,7 +8,16 @@ import AuthModal from "@/components/AuthModal";
 import { authFetch } from "@/lib/utils/auth-fetch";
 import { useAuth } from "@/contexts/AuthContext";
 import Swal from "sweetalert2";
-import { Bookmark, Trash2, Briefcase, Plus, TrendingUp, TrendingDown, Loader2, Star } from "lucide-react";
+import {
+  Bookmark,
+  Trash2,
+  Briefcase,
+  Plus,
+  TrendingUp,
+  TrendingDown,
+  Loader2,
+  Star,
+} from "lucide-react";
 
 interface StockDetails {
   symbol: string;
@@ -49,19 +58,67 @@ export default function StockDetailPage() {
   );
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [newsLoading, setNewsLoading] = useState(false);
-
+  const [timeframe, setTimeframe] = useState("D");
+  const [chartType, setChartType] = useState("line");
   useEffect(() => {
     if (symbol) {
-      fetchStockDetails();
       checkPortfolioAndWishlist();
       fetchStockNews();
     }
   }, [symbol]);
 
+  useEffect(() => {
+    if (symbol) {
+      fetchStockDetails();
+    }
+  }, [symbol, timeframe]);
+
+  // Real-time price polling
+  useEffect(() => {
+    if (!symbol) return;
+    
+    const fetchRealTimePrice = async () => {
+      try {
+        const response = await fetch(`/api/stock-price?symbol=${symbol}`);
+        const data = await response.json();
+        if (data.success && data.data) {
+          setStockDetails(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              quote: {
+                ...prev.quote,
+                c: data.data.price,
+                d: data.data.change,
+                dp: data.data.changePercent,
+                h: data.data.high,
+                l: data.data.low,
+                o: data.data.open,
+                pc: data.data.previousClose,
+                t: data.data.timestamp,
+                extPrice: data.data.extPrice,
+                extChange: data.data.extChange,
+                extChangePercent: data.data.extChangePercent,
+                marketStatus: data.data.marketStatus,
+              }
+            };
+          });
+        }
+      } catch (err) {
+        // Ignore polling errors to not break UI
+      }
+    };
+
+    const intervalId = setInterval(fetchRealTimePrice, 10000);
+    return () => clearInterval(intervalId);
+  }, [symbol]);
+
   const fetchStockDetails = async () => {
     try {
-      setIsLoading(true);
-      const response = await fetch(`/api/stock-details/${symbol}`);
+      if (!stockDetails) setIsLoading(true);
+      const response = await fetch(
+        `/api/stock-details/${symbol}?timespan=${timeframe}`,
+      );
       const data = await response.json();
 
       if (data.success) {
@@ -360,13 +417,81 @@ export default function StockDetailPage() {
                     </span>
                   </div>
                   <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1">
-                    Open: ${quote.o?.toFixed(2)} &nbsp;|&nbsp; High: ${quote.h?.toFixed(2)}{" "}
-                    &nbsp;|&nbsp; Low: ${quote.l?.toFixed(2)}
+                    Open: ${quote.o?.toFixed(2)} &nbsp;|&nbsp; High: $
+                    {quote.h?.toFixed(2)} &nbsp;|&nbsp; Low: $
+                    {quote.l?.toFixed(2)}
                   </p>
                 </div>
               </div>
             </div>
           )}
+
+          {/* Price History Chart */}
+          {(stockDetails as any).bars &&
+            (stockDetails as any).bars.length > 0 && (
+              <div className="mb-6 rounded-xl border border-gray-200/80 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm">
+                <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    Price History
+                  </h2>
+                  <div className="flex gap-2">
+                    {/* Chart Type Dropdown */}
+                    <div className="relative">
+                      <select
+                        value={chartType}
+                        onChange={(e) => setChartType(e.target.value)}
+                        className="appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2 pr-10 text-sm font-semibold text-gray-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-blue-400"
+                      >
+                        <option value="candlestick">Candlestick</option>
+                        <option value="heikinashi">Heikin Ashi</option>
+                        <option value="line">Line</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                        <svg
+                          className="h-4 w-4 fill-current"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Timeframe Dropdown */}
+                    <div className="relative">
+                      <select
+                        value={timeframe}
+                        onChange={(e) => setTimeframe(e.target.value)}
+                        className="appearance-none rounded-lg border border-gray-200 bg-white px-4 py-2 pr-10 text-sm font-semibold text-gray-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-blue-400"
+                      >
+                        <option value="M1">1 Minute</option>
+                        <option value="M5">5 Minutes</option>
+                        <option value="M15">15 Minutes</option>
+                        <option value="M30">30 Minutes</option>
+                        <option value="M60">1 Hour</option>
+                        <option value="M120">2 Hours</option>
+                        <option value="M240">4 Hours</option>
+                        <option value="D">Daily</option>
+                        <option value="W">Weekly</option>
+                        <option value="M">Monthly</option>
+                        <option value="Y">Yearly</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                        <svg
+                          className="h-4 w-4 fill-current"
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <InlineStockChart
+                  data={(stockDetails as any).bars}
+                  chartType={chartType}
+                />
+              </div>
+            )}
 
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Company Info Card */}
@@ -887,5 +1012,425 @@ export default function StockDetailPage() {
         initialMode={authModalMode}
       />
     </>
+  );
+}
+
+function InlineStockChart({
+  data,
+  chartType = "candlestick",
+}: {
+  data: any[];
+  chartType?: string;
+}) {
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
+  // Transform data for Heikin Ashi if selected
+  const displayData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    if (chartType === "heikinashi") {
+      const haData = [];
+      let prevHAOpen = data[0].open;
+      let prevHAClose = data[0].close;
+
+      for (let i = 0; i < data.length; i++) {
+        const d = data[i];
+        const haClose = (d.open + d.high + d.low + d.close) / 4;
+        let haOpen;
+        if (i === 0) {
+          haOpen = (d.open + d.close) / 2;
+        } else {
+          haOpen = (prevHAOpen + prevHAClose) / 2;
+        }
+        const haHigh = Math.max(d.high, haOpen, haClose);
+        const haLow = Math.min(d.low, haOpen, haClose);
+
+        haData.push({
+          ...d,
+          originalOpen: d.open,
+          originalHigh: d.high,
+          originalLow: d.low,
+          originalClose: d.close,
+          open: haOpen,
+          high: haHigh,
+          low: haLow,
+          close: haClose,
+        });
+
+        prevHAOpen = haOpen;
+        prevHAClose = haClose;
+      }
+      return haData;
+    }
+    return data;
+  }, [data, chartType]);
+
+  const chartData = useMemo(() => {
+    if (!displayData || displayData.length === 0) return null;
+    let minLow = Infinity;
+    let maxHigh = -Infinity;
+    let maxVol = 0;
+    displayData.forEach((d) => {
+      if (d.low < minLow) minLow = d.low;
+      if (d.high > maxHigh) maxHigh = d.high;
+      if (d.volume > maxVol) maxVol = d.volume;
+    });
+    const padding = (maxHigh - minLow) * 0.1;
+    return {
+      yMin: minLow - padding,
+      yMax: maxHigh + padding,
+      yRange: maxHigh + padding - (minLow - padding),
+      maxVol: maxVol || 1,
+    };
+  }, [displayData]);
+
+  if (!chartData || !displayData || displayData.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-gray-500 dark:border-gray-700 dark:bg-gray-800/50">
+        No chart data available
+      </div>
+    );
+  }
+
+  const { yMin, yMax, yRange, maxVol } = chartData;
+  const fullWidth = 1000;
+  const fullHeight = 450;
+  const chartWidth = 940; // Leave 60px for Y axis
+  const priceHeight = 320;
+  const volHeight = 100;
+
+  const barWidth = Math.max((chartWidth / displayData.length) * 0.6, 2);
+  const xSpacing = chartWidth / displayData.length;
+
+  const formatDate = (timeStr: string) => {
+    const d = new Date(timeStr);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
+
+  const hoverData =
+    hoverIndex !== null && displayData[hoverIndex]
+      ? displayData[hoverIndex]
+      : displayData[displayData.length - 1];
+
+  // For Line Chart
+  const linePoints = useMemo(() => {
+    if (chartType !== "line") return "";
+    return displayData
+      .map((d, i) => {
+        const x = i * xSpacing + xSpacing / 2;
+        const y = priceHeight - ((d.close - yMin) / yRange) * priceHeight;
+        return `${x},${y}`;
+      })
+      .join(" ");
+  }, [displayData, chartType, xSpacing, yMin, yRange, priceHeight]);
+
+  return (
+    <div className="relative w-full overflow-hidden rounded-xl border border-gray-300 bg-[#ffffff] shadow-sm select-none dark:border-gray-800 dark:bg-[#131722]">
+      {/* Top Info Bar (TradingView style) */}
+      <div className="flex flex-wrap items-center gap-4 border-b border-gray-200 bg-gray-50/50 px-4 py-2 font-mono text-xs sm:text-sm dark:border-gray-800 dark:bg-[#131722]">
+        {hoverData && (
+          <>
+            <div className="text-gray-500 dark:text-gray-400">
+              O{" "}
+              <span
+                className={`font-semibold ${
+                  hoverData.open <= hoverData.close
+                    ? "text-[#089981]"
+                    : "text-[#f23645]"
+                }`}
+              >
+                {(hoverData.originalOpen || hoverData.open).toFixed(2)}
+              </span>
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              H{" "}
+              <span
+                className={`font-semibold ${
+                  hoverData.open <= hoverData.close
+                    ? "text-[#089981]"
+                    : "text-[#f23645]"
+                }`}
+              >
+                {(hoverData.originalHigh || hoverData.high).toFixed(2)}
+              </span>
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              L{" "}
+              <span
+                className={`font-semibold ${
+                  hoverData.open <= hoverData.close
+                    ? "text-[#089981]"
+                    : "text-[#f23645]"
+                }`}
+              >
+                {(hoverData.originalLow || hoverData.low).toFixed(2)}
+              </span>
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              C{" "}
+              <span
+                className={`font-semibold ${
+                  hoverData.open <= hoverData.close
+                    ? "text-[#089981]"
+                    : "text-[#f23645]"
+                }`}
+              >
+                {(hoverData.originalClose || hoverData.close).toFixed(2)}
+              </span>
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              Vol{" "}
+              <span className="font-semibold text-gray-800 dark:text-gray-200">
+                {(hoverData.volume / 1000).toFixed(1)}K
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* SVG Chart */}
+      <div className="relative h-[400px] w-full cursor-crosshair sm:h-[500px]">
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${fullWidth} ${fullHeight}`}
+          preserveAspectRatio="none"
+          onMouseLeave={() => setHoverIndex(null)}
+          onMouseMove={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const ratioX = mouseX / rect.width;
+            const svgX = ratioX * fullWidth;
+            if (svgX < chartWidth) {
+              let idx = Math.floor(svgX / xSpacing);
+              if (idx < 0) idx = 0;
+              if (idx >= displayData.length) idx = displayData.length - 1;
+              setHoverIndex(idx);
+            }
+          }}
+        >
+          {/* Grid and Y-axis labels */}
+          {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
+            const y = priceHeight * ratio;
+            const price = yMax - yRange * ratio;
+            return (
+              <g key={`grid-${i}`}>
+                <line
+                  x1="0"
+                  y1={y}
+                  x2={chartWidth}
+                  y2={y}
+                  stroke="currentColor"
+                  className="text-gray-100 dark:text-[#1f2937]"
+                  strokeDasharray="4 4"
+                  vectorEffect="non-scaling-stroke"
+                />
+                <text
+                  x={chartWidth + 10}
+                  y={y + 4}
+                  className="fill-gray-500 font-mono text-[11px] dark:fill-[#787b86]"
+                >
+                  {price.toFixed(2)}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* X-axis labels (render fewer labels) */}
+          {displayData.map((d, i) => {
+            const step = Math.max(Math.floor(displayData.length / 6), 1);
+            if (i % step === 0 && i !== displayData.length - 1) {
+              const x = i * xSpacing + xSpacing / 2;
+              return (
+                <g key={`x-axis-${i}`}>
+                  <line
+                    x1={x}
+                    y1={priceHeight + volHeight}
+                    x2={x}
+                    y2={priceHeight + volHeight + 5}
+                    stroke="currentColor"
+                    className="text-gray-300 dark:text-[#2b313f]"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <text
+                    x={x}
+                    y={priceHeight + volHeight + 20}
+                    textAnchor="middle"
+                    className="fill-gray-500 font-mono text-[10px] dark:fill-[#787b86]"
+                  >
+                    {formatDate(d.time)}
+                  </text>
+                </g>
+              );
+            }
+            return null;
+          })}
+
+          {/* Separator lines */}
+          <line
+            x1={chartWidth}
+            y1={0}
+            x2={chartWidth}
+            y2={fullHeight}
+            stroke="currentColor"
+            className="text-gray-200 dark:text-[#2b313f]"
+            vectorEffect="non-scaling-stroke"
+          />
+          <line
+            x1={0}
+            y1={priceHeight + volHeight}
+            x2={chartWidth}
+            y2={priceHeight + volHeight}
+            stroke="currentColor"
+            className="text-gray-200 dark:text-[#2b313f]"
+            vectorEffect="non-scaling-stroke"
+          />
+
+          {/* Render Line Chart */}
+          {chartType === "line" && (
+            <polyline
+              points={linePoints}
+              fill="none"
+              stroke="#2962ff"
+              strokeWidth="2"
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+
+          {/* Volume and Candles */}
+          {displayData.map((d, i) => {
+            const isUp = d.close >= d.open;
+            const colorClass = isUp ? "text-[#089981]" : "text-[#f23645]";
+            const volColorClass = isUp
+              ? "fill-[#089981] opacity-50"
+              : "fill-[#f23645] opacity-50";
+            const x = i * xSpacing + xSpacing / 2;
+
+            // Volume coordinates
+            const vHeight = (d.volume / maxVol) * volHeight;
+            const vY = priceHeight + volHeight - vHeight;
+
+            // Price coordinates
+            const yHigh =
+              priceHeight - ((d.high - yMin) / yRange) * priceHeight;
+            const yLow = priceHeight - ((d.low - yMin) / yRange) * priceHeight;
+            const yOpen =
+              priceHeight - ((d.open - yMin) / yRange) * priceHeight;
+            const yClose =
+              priceHeight - ((d.close - yMin) / yRange) * priceHeight;
+            const rectY = Math.min(yOpen, yClose);
+            const rectHeight = Math.max(Math.abs(yOpen - yClose), 1);
+
+            return (
+              <g key={`bar-${i}`}>
+                {/* Volume Bar */}
+                <rect
+                  x={x - barWidth / 2}
+                  y={vY}
+                  width={barWidth}
+                  height={vHeight}
+                  className={volColorClass}
+                />
+
+                {/* Render Candlesticks / Heikin Ashi */}
+                {chartType !== "line" && (
+                  <>
+                    {/* Candle Wick */}
+                    <line
+                      x1={x}
+                      y1={yHigh}
+                      x2={x}
+                      y2={yLow}
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      vectorEffect="non-scaling-stroke"
+                      className={colorClass}
+                    />
+
+                    {/* Candle Body */}
+                    <rect
+                      x={x - barWidth / 2}
+                      y={rectY}
+                      width={barWidth}
+                      height={rectHeight}
+                      className={`fill-current ${colorClass}`}
+                    />
+                  </>
+                )}
+              </g>
+            );
+          })}
+
+          {/* Interactive Crosshair */}
+          {hoverIndex !== null &&
+            displayData[hoverIndex] &&
+            (() => {
+              const d = displayData[hoverIndex];
+              const x = hoverIndex * xSpacing + xSpacing / 2;
+              const yClose =
+                priceHeight - ((d.close - yMin) / yRange) * priceHeight;
+              return (
+                <g className="pointer-events-none">
+                  {/* Vertical Crosshair Line */}
+                  <line
+                    x1={x}
+                    y1={0}
+                    x2={x}
+                    y2={priceHeight + volHeight}
+                    stroke="currentColor"
+                    className="text-gray-400 dark:text-[#787b86]"
+                    strokeDasharray="4 4"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  {/* Horizontal Crosshair Line */}
+                  <line
+                    x1={0}
+                    y1={yClose}
+                    x2={chartWidth}
+                    y2={yClose}
+                    stroke="currentColor"
+                    className="text-gray-400 dark:text-[#787b86]"
+                    strokeDasharray="4 4"
+                    vectorEffect="non-scaling-stroke"
+                  />
+
+                  {/* Y-axis Label Highlight */}
+                  <rect
+                    x={chartWidth}
+                    y={yClose - 10}
+                    width={60}
+                    height={20}
+                    className="fill-blue-600"
+                  />
+                  <text
+                    x={chartWidth + 30}
+                    y={yClose + 4}
+                    textAnchor="middle"
+                    className="fill-white font-mono text-[11px] font-bold"
+                  >
+                    {d.close.toFixed(2)}
+                  </text>
+
+                  {/* X-axis Label Highlight */}
+                  <rect
+                    x={x - 35}
+                    y={priceHeight + volHeight}
+                    width={70}
+                    height={20}
+                    className="fill-blue-600"
+                  />
+                  <text
+                    x={x}
+                    y={priceHeight + volHeight + 14}
+                    textAnchor="middle"
+                    className="fill-white font-mono text-[10px] font-bold"
+                  >
+                    {formatDate(d.time)}
+                  </text>
+                </g>
+              );
+            })()}
+        </svg>
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
+import { getWebullSnapshot } from "@/lib/utils/stockPrice";
 
 /**
  * GET /api/stock-price?symbol=AAPL
@@ -16,25 +15,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!FINNHUB_API_KEY) {
-    return NextResponse.json(
-      { success: false, error: "API key not configured" },
-      { status: 500 },
-    );
-  }
-
   try {
-    // Fetch quote from Finnhub
-    const response = await fetch(
-      `https://finnhub.io/api/v1/quote?symbol=${symbol.toUpperCase()}&token=${FINNHUB_API_KEY}`,
-      { next: { revalidate: 30 } }, // Cache for 30 seconds
-    );
+    const data = await getWebullSnapshot(symbol, 30);
 
-    if (!response.ok) {
+    if (!data) {
       throw new Error("Failed to fetch stock price");
     }
-
-    const data = await response.json();
 
     // Determine market status based on current time (US Eastern Time)
     const now = new Date();
@@ -84,16 +70,16 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         symbol: symbol.toUpperCase(),
-        price: data.c || 0, // Current price
-        change: data.d || 0, // Change
-        changePercent: data.dp || 0, // Percent change
-        high: data.h || 0, // High price of the day
-        low: data.l || 0, // Low price of the day
-        open: data.o || 0, // Open price
-        previousClose: data.pc || 0, // Previous close
+        price: parseFloat(data.price) || 0,
+        change: parseFloat(data.change) || 0,
+        changePercent: parseFloat(data.change_ratio) * 100 || 0,
+        high: parseFloat(data.high) || 0,
+        low: parseFloat(data.low) || 0,
+        open: parseFloat(data.open) || 0,
+        previousClose: parseFloat(data.pre_close) || 0,
         isMarketOpen,
-        marketStatus,
-        timestamp: data.t || Date.now() / 1000,
+        marketStatus: data.market_status || data.status || marketStatus,
+        timestamp: data.quote_time ? data.quote_time / 1000 : Date.now() / 1000,
       },
     });
   } catch (error) {

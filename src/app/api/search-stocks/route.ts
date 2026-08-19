@@ -14,7 +14,9 @@ async function searchWithFinnhub(query: string) {
 
   try {
     const response = await fetch(
-      `https://finnhub.io/api/v1/search?q=${encodeURIComponent(query)}&token=${FINNHUB_API_KEY}`,
+      `https://finnhub.io/api/v1/search?q=${encodeURIComponent(
+        query,
+      )}&token=${FINNHUB_API_KEY}`,
       { next: { revalidate: 3600 } },
     );
 
@@ -50,7 +52,9 @@ async function searchWithAlphaVantage(query: string) {
 
   try {
     const response = await fetch(
-      `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(query)}&apikey=${ALPHAVANTAGE_API_KEY}`,
+      `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${encodeURIComponent(
+        query,
+      )}&apikey=${ALPHAVANTAGE_API_KEY}`,
       { next: { revalidate: 3600 } },
     );
 
